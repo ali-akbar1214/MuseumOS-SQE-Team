@@ -34,6 +34,7 @@ import {
   searchQuerySchema,
   globalSearchSchema,
 } from '@museumos/contracts';
+import { validateExhibitTransition, type ExhibitWorkflowRecord } from './exhibit-workflow';
 
 @Controller('exhibits')
 export class ExhibitsController {
@@ -229,6 +230,16 @@ export class ExhibitsController {
     if (!parsed.success) throw new BadRequestException(parsed.error.flatten());
 
     const before = await this.exhibitsService.findById(id);
+    if (parsed.data.validated !== undefined || parsed.data.published !== undefined) {
+      const transition = validateExhibitTransition({
+        exhibitName: parsed.data.exhibitName ?? before.exhibitName,
+        categoryId: parsed.data.categoryId ?? before.categoryId,
+        current: before as ExhibitWorkflowRecord,
+        nextValidated: parsed.data.validated ?? before.validated,
+        nextPublished: parsed.data.published ?? before.published,
+      });
+      if (!transition.allowed) throw new BadRequestException(transition.reason);
+    }
     const updated = await this.exhibitsService.update(id, parsed.data, actor.id);
 
     const diff = this.auditService.computeDiff(

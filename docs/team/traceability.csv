@@ -1,0 +1,9 @@
+Requirement,Workflow,Unit,API,Browser,Security,Performance,Notes
+FR-01,W1,Tested,Tested,Tested,Not applicable,Not applicable,Name required
+FR-02,W1,Tested,Tested,Tested,Not applicable,Not applicable,Category UUID required
+FR-03,W1,Tested,Tested,Tested,Not applicable,Not applicable,Year 1800-2100
+FR-04,W1,Tested,Tested,Tested,Not applicable,Not applicable,Price >= 0
+FR-05,W1,Tested,Tested,Tested,Not applicable,Tested,Display ID and read-back
+FR-06,W2,Tested,Tested,Tested,Tested,Not applicable,Validation gate
+FR-07,W2,Tested,Tested,Tested,Tested,Not applicable,Publish prerequisites
+FR-08,W2,Tested,Tested,Tested,Tested,Not applicable,Published is terminal
