@@ -1,0 +1,52 @@
+{
+  "generatedFrom": "docs/team/openapi.yaml",
+  "constraintSummary": "Exhibit year and collectiblePrice limits",
+  "year": [
+    {
+      "value": 1799,
+      "partition": "invalid-low"
+    },
+    {
+      "value": 1800,
+      "partition": "valid"
+    },
+    {
+      "value": 1801,
+      "partition": "valid"
+    },
+    {
+      "value": 2099,
+      "partition": "valid"
+    },
+    {
+      "value": 2100,
+      "partition": "valid"
+    },
+    {
+      "value": 2101,
+      "partition": "invalid-high"
+    }
+  ],
+  "collectiblePrice": [
+    {
+      "value": -0.01,
+      "partition": "invalid-negative"
+    },
+    {
+      "value": 0,
+      "partition": "valid"
+    },
+    {
+      "value": 0.01,
+      "partition": "valid"
+    },
+    {
+      "value": 999.99,
+      "partition": "valid"
+    },
+    {
+      "value": 1000,
+      "partition": "valid"
+    }
+  ]
+}
