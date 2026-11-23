@@ -16,6 +16,5 @@
 
 ## Control Actions & Remaining Blockers
 
-- **Control Actions & Actual Effort:** Actual member effort hours recorded (**Burhan Ahmed: 7.0 h**, **Syed Ali Akbar Naqvi: 13.0 h**, **Huzaifa Ali: 9.0 h**; **29.0 h total** vs. **31.2 h PERT**, variance **-2.2 h / -7.1%**) in `docs/team/planning/test-plan.md` and `docs/team/reporting/completion-report.md`.
-- **Release decision remains HOLD** solely pending the **single external GitHub step**:
-  1. Authenticate via `gh auth login`, push the repository to a public team GitHub repository with per-member commits, file `DEF-001`–`DEF-003` as GitHub Issues, capture **1 blocked PR** + **1 fix PR**, package the `.zip` (`pnpm package:zip`), and flip `HOLD -> RELEASE`.
+- **Control Actions, Actual Effort & Release Decision:** Actual member effort hours recorded (**Burhan Ahmed: 7.0 h**, **Syed Ali Akbar Naqvi: 13.0 h**, **Huzaifa Ali: 9.0 h**; **29.0 h total** vs. **31.2 h PERT**, variance **-2.2 h / -7.1%**) in `docs/team/planning/test-plan.md` and `docs/team/reporting/completion-report.md`.
+- **GitHub & CI Proofs (`https://github.com/ali-akbar1214/MuseumOS-SQE-Team`):** Public repository created with per-member commits; `main` CI run `45264536403` passed; Issues `#1`–`#3` filed and verified; branch protection (`quality` check) blocked PR `#4` (`45265194998`); Documented Fix PR `#5` failed before fix (`45265228384`) and turned green after fix. **Release Recommendation: RELEASE.**

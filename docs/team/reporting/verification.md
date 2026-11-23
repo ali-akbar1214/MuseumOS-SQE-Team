@@ -34,4 +34,4 @@
 | `node scripts/team/run-lighthouse-audit.mjs` | **PASS (multi-screen authenticated CLI run)** | Exhibits list & detail: Accessibility **1.00**, Best Practices **1.00**, SEO **0.82**; `docs/team/evidence/accessibility/lighthouse-multi-screen.json` |
 | `scripts/team/run-zap-passive.ps1` (`zaproxy:stable`) | **PASS (8/8 Playwright tests proxied through ZAP)** | 9 unique alerts / 153 instances (`0 High`, `3 Medium`, `2 Low`, `4 Info`); `docs/team/evidence/security/zap-passive-report.{html,json}` |
 | `python -B docs/team/generators/generate-charts.py` | **PASS** | Generated 5 PNG diagrams in `docs/team/evidence/charts/` |
-| Public GitHub repo, per-member commits, Issues, Blocked PR + Fix PR | **PENDING TEAM ACTION** | Remote still points to upstream `akolit/MuseumOS.git` (`gh auth` not logged in) |
+| Public GitHub repo, per-member commits, Issues, Blocked PR + Fix PR | **PASS (`RELEASE`)** | Repo `https://github.com/ali-akbar1214/MuseumOS-SQE-Team`; `main` run `45264536403` PASS; Issues `#1`–`#3`; Blocked PR `#4` (`45265194998`, `BLOCKED`); Fix PR `#5` (`45265228384` fail -> pass) |

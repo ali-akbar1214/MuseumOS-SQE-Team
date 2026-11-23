@@ -22,6 +22,7 @@ export async function loginAs(page: Page, identifier: string | undefined, secret
   if (!identifier || !secret) {
     throw new Error('Set the matching TEST_*_EMAIL and TEST_*_PASSWORD values for browser tests');
   }
+  await page.context().clearCookies();
   await page.addInitScript(() => localStorage.setItem('lang', 'en'));
   await page.goto('/login');
   await page.locator('#identifier').fill(identifier);
@@ -39,7 +40,7 @@ export async function loginAdmin(page: Page) {
         await page.addInitScript(() => localStorage.setItem('lang', 'en'));
         await page.context().addCookies(cached.cookies);
         await page.goto('/');
-        const probe = await apiRequest(page, 'GET', '/api/exhibits?limit=1');
+        const probe = await apiRequest(page, 'GET', '/api/auth/me');
         if (probe.status === 200) return;
       }
     } catch {
