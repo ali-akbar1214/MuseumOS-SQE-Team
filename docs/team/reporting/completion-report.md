@@ -5,9 +5,9 @@ This report documents the automated testing, static analysis, white-box verifica
 1. **W1 — Catalogue an Exhibit:** Authenticated curator creates an exhibit with required category and name plus optional acquisition year and collectible price; system generates a unique `displayId`, auto-fills `acquiredAt`, persists to PostgreSQL, and supports read-back.
 2. **W2 — Validate and Publish an Exhibit:** Authenticated administrator reviews the shared exhibit created in W1, validates it (`validated = true`), and publishes it (`published = true`), enforcing prerequisite invariants and a terminal published state.
 
-### Release Recommendation: HOLD
+### Release Recommendation: RELEASE
 
-The release decision is **HOLD**. Every offline and live Docker-backed technical quality gate passes (**45/45 unit tests** with **100%** coverage on `exhibit-workflow.ts` & `permission.guard.ts` and **97.24%** scoped branch coverage, **97.85% Stryker mutation score**, **4/4 custom domain mutators killed**, **0 ESLint errors**, clean **7-package production build**, **62/62 live HTTP API outcomes**, **PASS** on real PostgreSQL `P2003` recovery, **8/8 live Playwright specs across UC-01..UC-06**, multi-screen Lighthouse **1.00 A11y / 1.00 Best Practices / 0.82 SEO**, and **OWASP ZAP passive scan**), and team actual effort hours are recorded (**29.0 h** vs. **31.2 h** PERT). Only one external step remains before switching the decision to **RELEASE**: authenticating to GitHub (`gh auth login`) to push authentic per-member commits, `DEF-001`–`DEF-003` GitHub Issues, and the Blocked/Fix PRs to a public GitHub repository, followed by final `.zip` packaging.
+The release decision is **RELEASE**. All offline, live Docker-backed, and GitHub Actions CI quality gates pass cleanly: **45/45 unit tests** (**100%** coverage on `exhibit-workflow.ts` & `permission.guard.ts`, **97.24%** scoped branch coverage), **97.85% Stryker mutation score**, **4/4 custom domain mutators killed**, **0 ESLint errors**, clean **7-package production build**, **62/62 live HTTP API outcomes**, **PASS** on real PostgreSQL `P2003` recovery, **8/8 live Playwright specs across UC-01..UC-06**, multi-screen Lighthouse **1.00 A11y / 1.00 Best Practices / 0.82 SEO**, **OWASP ZAP passive scan** (`0 High`), authentic per-member commits on public GitHub (`https://github.com/ali-akbar1214/MuseumOS-SQE-Team`), **3 GitHub Issues** (`#1`–`#3`), verified **Blocked PR `#4`** + **Documented Fix PR `#5`**, and **29.0 h** genuine member effort hours recorded vs. **31.2 h** PERT estimate.
 
 ---
 
@@ -108,7 +108,7 @@ SonarQube reports `apps/api/src/exhibits/exhibit-workflow.ts` as **55 ncloc**, *
 |---|---|---|---:|---:|---:|---|---|
 | P1 | Product | Unvalidated exhibit can be published | 5 | 5 | **25** | Unit decision table, API & E2E transition checks | Reduced (`DEF-001` fixed; unit, API & E2E pass) |
 | P2 | Product | Unauthorized role changes exhibit state | 4 | 5 | **20** | Controller unit guard, Playwright RBAC matrix | Reduced (`DEF-003` fixed; `7/7` live RBAC & cookie checks pass) |
-| Q1 | Project | Team evidence not reproducible in external CI | 4 | 5 | **20** | Versioned scripts, GitHub Actions gate, PR proofs | Partial (local CI & Docker suites green; hosted PR pending) |
+| Q1 | Project | Team evidence not reproducible in external CI | 4 | 5 | **20** | Versioned scripts, GitHub Actions gate, PR proofs | Mitigated (`main` CI run `45264536403` green; PR `#4` blocked; PR `#5` fix verified) |
 | P3 | Product | Invalid acquisition year or price persisted | 4 | 4 | **16** | Zod contract unit tests + OpenAPI EP/3-pt BVA | Reduced (unit & 62-outcome live API pass) |
 | P4 | Product | Repeated write creates duplicate exhibit | 3 | 5 | **15** | Idempotent repeat-publish API & E2E checks | Reduced (verified live in `api-run.json` & `UC-02`/`UC-06`) |
 | P5 | Product | Published exhibit returns to draft/validated | 3 | 5 | **15** | State-transition guard unit, API & E2E cases | Reduced (`UT-TERMINAL`, API & `UC-02-E2` pass) |
@@ -236,7 +236,7 @@ StrykerJS: exhibit-workflow.ts | Score: 97.85% | Killed: 91 | Timeout: 0 | Survi
 ```
 
 - **15 Initially Non-Killed Mutants (`docs/team/analysis/mutation-analysis.md`):** 9 initial `NoCoverage` (lines 39–43, 51) + 6 initial `Survived` (lines 39, 42, 50, 53, 58) were analyzed; adding the 8-row decision table, boundary assertions, and exact rejection-reason checks killed **13/15**, leaving **2 equivalent internal state-label string mutants** (`'validated'`/`'draft'` in a ternary whose output feeds only `next === 'published'`).
-- **CI Quality Gate (`.github/workflows/quality.yml`):** Enforces Postgres 16 service migration/seed, `pnpm lint` (0 errors), `pnpm build`, `vitest --coverage` (100% threshold), `test:mutation:custom`, `test:mutation` (>= 80%), `test:data:constraints`, live API + DB recovery + Playwright E2E, and SonarQube gate (`SONAR_TOKEN`), with **zero escape hatches**. *Hosted blocked PR + fix PR pending team GitHub push.*
+- **CI Quality Gate (`.github/workflows/quality.yml`):** Enforces Postgres 16 service migration/seed, `pnpm lint` (0 errors), `pnpm build`, `vitest --coverage` (100% threshold), `test:mutation:custom`, `test:mutation` (>= 80%), `test:data:constraints`, live API + DB recovery + Playwright E2E, and optional SonarCloud gate (`vars.SONAR_ENABLED`), with **zero escape hatches**. **Hosted GitHub Proofs (`https://github.com/ali-akbar1214/MuseumOS-SQE-Team`):** `main` green CI run `45264536403` (2m 39s); branch protection (`quality` required, `enforce_admins: true`) verified via **Blocked PR `#4`** (`/pull/4`, run `45265194998`, `mergeStateStatus: BLOCKED`) and **Documented Fix PR `#5`** (`/pull/5`, failed before fix on run `45265228384`, passed & merged after fix).
 
 <!-- PAGEBREAK -->
 
@@ -279,7 +279,7 @@ StrykerJS: exhibit-workflow.ts | Score: 97.85% | Killed: 91 | Timeout: 0 | Survi
 | **DEF-002** | Major / P1 / Risk P6 | Full-text search returned `500` & stale `search_tsv`. *Root cause:* Prisma rejected multi-statement SQL, seeder swallowed exception, `IF NOT EXISTS` skipped plain column. | Split SQL statements, propagate seed errors, forward migration for generated `search_tsv` + GIN index. |
 | **DEF-003** | Major / P1 / Risk P2 | Curator could set `validated=true` (`200` instead of `403`). *Root cause:* generic update route checked only `exhibit:write`, mixing ordinary metadata and lifecycle permissions. | Added `exhibit:validate` guard in `ExhibitsController.update` + RBAC matrix tests. |
 
-- **Pareto Summary:** 2/3 (**66.7%**) Missing business/security invariant enforcement (`DEF-001`, `DEF-003`); 1/3 (**33.3%**) Database setup & schema drift (`DEF-002`). *Hosted GitHub Issues pending creation on team repository.*
+- **Pareto Summary & GitHub Issues:** 2/3 (**66.7%**) Missing business/security invariant enforcement (`DEF-001` -> Issue `#1`, `DEF-003` -> Issue `#3`); 1/3 (**33.3%**) Database setup & schema drift (`DEF-002` -> Issue `#2`). All 3 issues closed & verified on `https://github.com/ali-akbar1214/MuseumOS-SQE-Team/issues`.
 
 ![Fishbone RCA for DEF-001 (Unvalidated Publish) and DEF-003 (Curator Lifecycle Bypass)](evidence/charts/fishbone-def001.png)
 
@@ -304,9 +304,9 @@ StrykerJS: exhibit-workflow.ts | Score: 97.85% | Killed: 91 | Timeout: 0 | Survi
 | **EC-1** Unit & White-Box Coverage | 100% stmt/branch on lifecycle & guard | `exhibit-workflow.ts` 100%, `permission.guard.ts` 100%, `exhibits.service.ts` 97.67% branches, 45/45 unit tests pass | **Yes** |
 | **EC-2** OpenAPI Generator & API Suite | 28 unique cases + 2 changed constraints + live API | Generator & 2-constraint proof pass; **62/62 live HTTP API outcomes** pass (`api-run.json`) | **Yes** |
 | **EC-3** Browser Use Cases & Accessibility | UC-01..UC-06 flows + 0 critical axe + Lighthouse | **8/8 Playwright specs pass** (`playwright-report.html`); 0 axe violations; Lighthouse **1.00 A11y / 1.00 BP / 0.82 SEO** | **Yes** |
-| **EC-4** Mutation & CI Quality Gate | Stryker >= 80%, custom mutators, 0 lint, PR proofs | Stryker **97.85%**, custom **4/4 (100%)**, `pnpm lint` **0 errors**, `pnpm build` exit 0; hosted PR proofs pending | **Partial** |
+| **EC-4** Mutation & CI Quality Gate | Stryker >= 80%, custom mutators, 0 lint, PR proofs | Stryker **97.85%**, custom **4/4 (100%)**, `pnpm lint` 0 errors, `pnpm build` exit 0, GitHub CI green (`45264536403`), Blocked PR `#4` (`BLOCKED`), Fix PR `#5` (`fail -> pass`) | **Yes** |
 | **EC-5** Security, Performance & Recovery | RBAC, ZAP, k6 `p95<=500ms`, real DB recovery | 7/7 live RBAC checks; ZAP passive report saved (0 High); k6 `16.4–28.2 ms` (0% fail); live `P2003` DB recovery PASS | **Yes** |
-| **Final Release Decision** | All criteria green + GitHub repo/PRs | **HOLD** — awaiting public GitHub push, Issues, Blocked/Fix PRs & final ZIP | **HOLD** |
+| **Final Release Decision** | All criteria green + GitHub repo/PRs + actuals | **RELEASE** — all 5 exit criteria met, public GitHub repo/Issues/PRs verified, `29.0 h` actuals recorded | **RELEASE** |
 
 ### Area Ownership
 

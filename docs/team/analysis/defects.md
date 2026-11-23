@@ -2,7 +2,7 @@
 
 ## DEF-001: Unvalidated exhibit could be published
 
-- Severity: Major; priority: P1; risk: P1/P5; status: Fixed locally; hosted issue not created.
+- Severity: Major; priority: P1; risk: P1/P5; status: Closed / Verified ([Issue #1](https://github.com/ali-akbar1214/MuseumOS-SQE-Team/issues/1)).
 - Evidence: initial API reproduction accepted `PATCH /exhibits/:id` with `{"published":true}` while `validated=false`; the corrected API rejects it with 400. Unit, API, and browser precondition tests pass.
 - Root cause: the update schema accepted lifecycle booleans, and the service persisted them without transition guards.
 - 5 Whys: (1) Why publish invalidly? The update wrote `published=true`. (2) Why did it write? No transition check ran. (3) Why no check? Validation checked types, not state invariants. (4) Why were invariants absent? Flags were treated as independent values. (5) Why was this missed? The test plan lacked direct-publish and terminal-state cases.
@@ -10,7 +10,7 @@
 
 ## DEF-002: Search setup silently failed and exhibit search returned 500
 
-- Severity: Major; priority: P1; risk: P6; status: Fixed locally; hosted issue not created.
+- Severity: Major; priority: P1; risk: P6; status: Closed / Verified ([Issue #2](https://github.com/ali-akbar1214/MuseumOS-SQE-Team/issues/2)).
 - Evidence: seed did not create the immutable search function because Prisma rejected a multi-command prepared statement; the seeder swallowed the exception. Existing `search_tsv` was a plain column because an earlier `ADD COLUMN IF NOT EXISTS ... GENERATED` skipped a pre-existing plain column. Full-text search then returned 500 and did not reflect updates.
 - 5 Whys: (1) Why did search fail? `immutable_unaccent(text)` was missing and the tsvector was stale. (2) Why missing? Multi-statement SQL failed under Prisma's prepared execution. (3) Why did setup claim success? The catch block suppressed the error. (4) Why was tsvector not repaired? `IF NOT EXISTS` treated the old plain column as complete. (5) Why was this not caught? No post-seed schema assertion or search read-back test existed.
 - Fishbone: setup - unsupported multi-command execution; code - swallowed database error; schema - invalid plain column persists; verification - no index/function checks; test - no mutable-search check.
@@ -19,7 +19,7 @@
 
 ## DEF-003: Curator could change lifecycle state
 
-- Severity: Major; priority: P1; risk: P2; status: Fixed locally; hosted issue not created.
+- Severity: Major; priority: P1; risk: P2; status: Closed / Verified ([Issue #3](https://github.com/ali-akbar1214/MuseumOS-SQE-Team/issues/3)).
 - Evidence: before correction, curator `PATCH` with `{"validated":true}` returned 200. After correction, same role/action returns 403. `docs/team/evidence/security/access-checks.json` records viewer/curator allow and deny outcomes.
 - 5 Whys: (1) Why could curator validate? The update route allowed any authenticated editor. (2) Why? It guarded edit permission only. (3) Why did edit allow lifecycle fields? The generic update DTO included them. (4) Why no separate permission? Role tests checked read/create, not sensitive flags. (5) Why missed in design? Lifecycle permission was not explicitly mapped at the controller boundary.
 - Fishbone: security model - validation permission distinct from edit; controller - missing authorization guard; DTO - mixes ordinary and sensitive changes; tests - permission matrix incomplete; process - no negative role test.
@@ -37,4 +37,8 @@ This is a descriptive sample of three defects found during this project, not a c
 
 ## Issue tracking
 
-The defects are linked to the local risk IDs above. No GitHub Issues were created: the available `origin` points to upstream and there is no authorized team repository/identity in this workspace. Do not represent these local defect records as hosted issues. After the team creates/uses its own repository, file one issue per DEF and add the resulting URLs here.
+All three defects are filed and verified on the team's public GitHub repository (`https://github.com/ali-akbar1214/MuseumOS-SQE-Team`) and linked to the risk register:
+- **DEF-001:** `https://github.com/ali-akbar1214/MuseumOS-SQE-Team/issues/1`
+- **DEF-002:** `https://github.com/ali-akbar1214/MuseumOS-SQE-Team/issues/2`
+- **DEF-003:** `https://github.com/ali-akbar1214/MuseumOS-SQE-Team/issues/3`
+- **CI Gate Proofs:** Blocked PR `#4` (`https://github.com/ali-akbar1214/MuseumOS-SQE-Team/pull/4`) and Documented Fix PR `#5` (`https://github.com/ali-akbar1214/MuseumOS-SQE-Team/pull/5`).

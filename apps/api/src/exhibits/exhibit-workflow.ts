@@ -22,7 +22,7 @@ export function isAcquisitionYearAllowed(year: number | null): boolean {
 }
 
 export function isCollectiblePriceAllowed(price: number | null): boolean {
-  return price === null || (Number.isFinite(price) && price > 0);
+  return price === null || (Number.isFinite(price) && price >= 0);
 }
 
 export function getExhibitState(record: Pick<ExhibitWorkflowRecord, 'validated' | 'published'>): ExhibitState {

@@ -61,11 +61,11 @@ Planning estimates are person-hours; PERT expected time is `(O + 4M + P) / 6`. M
 | API generated EP/BVA suite | Every declared input; plus 2-constraint proof | Met: 28 unique EP/3-pt BVA cases, 2-constraint regeneration proof passing, and 62/62 live HTTP API outcomes passing against `museumos_sqe_test` (`api-run.json`). |
 | Browser workflows and role decisions | UC-01..UC-06 flows, persisted state, allow/deny | Met: 8/8 Playwright E2E specs pass across UC-01..UC-06 (`playwright-report.html`); 7/7 live RBAC checks pass (`access-checks.json`). |
 | axe key screens & Lighthouse | No critical/high findings; Before/After comparison | Met: 0 axe violations on Create, Detail, and Publish; multi-screen Lighthouse scored **1.00 A11y / 1.00 BP / 0.82 SEO** on both `/exhibits` and `/exhibits/:id` (up from 0.88 A11y baseline). |
-| Mutation & CI | Gate >=80%; custom mutators; 0 lint | Locally met: Stryker **97.85%** (91/93 killed, 2 equivalent survivors, 0 no-coverage), custom mutators **4/4 (100%)**, `pnpm lint` 0 errors, `pnpm build` exit 0. Hosted GitHub blocked PR + fix PR pending repo push. |
+| Mutation & CI | Gate >=80%; custom mutators; 0 lint | Met: Stryker **97.85%** (91/93 killed, 2 equivalent survivors, 0 no-coverage), custom mutators **4/4 (100%)**, `pnpm lint` 0 errors, `pnpm build` exit 0; GitHub `main` CI run `45264536403` PASS, Blocked PR `#4`, Fix PR `#5`. |
 | SonarQube metrics/complexity | Analyze baseline and final | Met: baseline/final scans captured; target module Sonar complexity 22 matches manual 22; Final Sonar Way quality gate OK. |
 | k6 & DB recovery | Two 60s runs at 1 VU and 5 VU; real recovery check | Met: 4 × 60s k6 runs p95 `16.40–28.16 ms` (`0%` fail); live Docker PostgreSQL `P2003` recovery test (`db-recovery-run.json`) and browser `UC-06` PASS. |
 | OWASP ZAP & dependency audit | Passive scan + dependency triage | Met: OWASP ZAP passive scan (`zaproxy:stable`) proxied 8/8 E2E workflows (`zap-passive-report.{html,json}` — 0 High, 3 Medium headers/SRI, 2 Low, 4 Info); 26 audit advisories triaged. |
-| Team commits, actual hours & viva | Actual hours logged + member commits + viva | Actual hours recorded (`29.0 h`: Burhan `7.0 h`, Ali `13.0 h`, Huzaifa `9.0 h`). Authentic member commits, GitHub Issues, PR proofs, and live viva defense pending GitHub repo push. |
+| Team commits, actual hours & viva | Actual hours logged + member commits + viva | Actual hours recorded (`29.0 h`: Burhan `7.0 h`, Ali `13.0 h`, Huzaifa `9.0 h`). Authentic member commits, Issues `#1`–`#3`, and PR `#4`/`#5` published on `ali-akbar1214/MuseumOS-SQE-Team`; live viva defense ready. |
 
 ## Schedule
 
