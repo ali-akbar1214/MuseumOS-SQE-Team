@@ -87,7 +87,7 @@ function categoryHasFunctional(code: string | undefined | null): boolean {
 function Field({ label, value }: { label: string; value: React.ReactNode }) {
   if (value === null || value === undefined || value === '' || value === '-') return null;
   return (
-    <div>
+    <div className="contents">
       <dt className="text-xs font-medium text-muted-foreground">{label}</dt>
       <dd className="mt-0.5">{value}</dd>
     </div>
@@ -97,7 +97,7 @@ function Field({ label, value }: { label: string; value: React.ReactNode }) {
 function BoolBadge({ value, trueLabel, falseLabel }: { value: boolean | null; trueLabel: string; falseLabel: string }) {
   if (value === null || value === undefined) return <span className="text-muted-foreground">-</span>;
   return value ? (
-    <span className="inline-flex items-center gap-1 text-green-600"><Check className="h-3.5 w-3.5" />{trueLabel}</span>
+    <span className="inline-flex items-center gap-1 text-green-700"><Check className="h-3.5 w-3.5" />{trueLabel}</span>
   ) : (
     <span className="inline-flex items-center gap-1 text-muted-foreground"><X className="h-3.5 w-3.5" />{falseLabel}</span>
   );
@@ -252,8 +252,8 @@ function ImageManager({
         throw new Error(body.message ?? `Upload failed (${res.status})`);
       }
       await onRefresh();
-    } catch (err: any) {
-      setError(err.message ?? t('toast.uploadFailed'));
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : t('toast.uploadFailed'));
     } finally {
       setBusy(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -265,7 +265,7 @@ function ImageManager({
     try {
       await api.patch(`/exhibits/${exhibitId}/images/${imageId}`, { isPrimary: true });
       await onRefresh();
-    } catch (err: any) { setError(err.message ?? t('toast.setPrimaryFailed')); }
+    } catch (err: unknown) { setError(err instanceof Error ? err.message : t('toast.setPrimaryFailed')); }
     finally { setBusy(false); }
   }
 
@@ -275,7 +275,7 @@ function ImageManager({
       await api.delete(`/exhibits/${exhibitId}/images/${imageId}`);
       setConfirmDelete(null);
       await onRefresh();
-    } catch (err: any) { setError(err.message ?? t('toast.deleteFailed')); }
+    } catch (err: unknown) { setError(err instanceof Error ? err.message : t('toast.deleteFailed')); }
     finally { setBusy(false); }
   }
 
@@ -292,7 +292,7 @@ function ImageManager({
         imageIds: reordered.map((i) => i.id),
       });
       await onRefresh();
-    } catch (err: any) { setError(err.message ?? t('toast.reorderFailed')); }
+    } catch (err: unknown) { setError(err instanceof Error ? err.message : t('toast.reorderFailed')); }
     finally { setBusy(false); }
   }
 
@@ -301,7 +301,7 @@ function ImageManager({
     try {
       await api.post(`/exhibits/${exhibitId}/images/${imageId}/rotate`, { direction });
       await onRefresh();
-    } catch (err: any) { setError(err.message ?? t('toast.error')); }
+    } catch (err: unknown) { setError(err instanceof Error ? err.message : t('toast.error')); }
     finally { setBusy(false); }
   }
 
@@ -324,7 +324,7 @@ function ImageManager({
         imageIds: reordered.map((i) => i.id),
       });
       await onRefresh();
-    } catch (err: any) { setError(err.message ?? t('toast.reorderFailed')); }
+    } catch (err: unknown) { setError(err instanceof Error ? err.message : t('toast.reorderFailed')); }
     finally { setBusy(false); }
   }
 
@@ -734,7 +734,7 @@ function ExhibitEditForm({
         <h2 className="mb-3 text-sm font-semibold">{t('exhibit.images')}</h2>
         <ImageManager
           exhibitId={exhibit.id}
-          images={(exhibit as any).images ?? []}
+          images={(exhibit as Exhibit & { images?: ExhibitImage[] }).images ?? []}
           onRefresh={onImagesChange}
         />
       </div>
@@ -913,7 +913,7 @@ function OpenLibraryModal({ isbn, onClose }: { isbn: string; onClose: () => void
               </div>
               <div className="space-y-3 text-sm">
                 <div>
-                  <h3 className="font-display text-lg font-bold leading-tight">{data.title}</h3>
+                  <h2 className="font-display text-lg font-bold leading-tight">{data.title}</h2>
                   {data.subtitle && <p className="text-muted-foreground">{data.subtitle}</p>}
                 </div>
                 {data.authors && data.authors.length > 0 && (
@@ -975,7 +975,7 @@ function IsbnField({ isbn }: { isbn: string }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   return (
-    <div>
+    <>
       <dt className="text-xs font-medium text-muted-foreground">ISBN</dt>
       <dd className="mt-0.5 inline-flex items-center gap-1.5">
         <span>{isbn}</span>
@@ -988,7 +988,7 @@ function IsbnField({ isbn }: { isbn: string }) {
         </button>
       </dd>
       {open && <OpenLibraryModal isbn={isbn} onClose={() => setOpen(false)} />}
-    </div>
+    </>
   );
 }
 
@@ -1188,7 +1188,7 @@ function EbayModal({ exhibit, onClose }: { exhibit: Exhibit; onClose: () => void
         setItems(res.items);
         if (res.marketplace) setMarketplace(res.marketplace);
       })
-      .catch((err: any) => { if (!cancelled) setError(err.message ?? t('toast.searchFailed')); })
+      .catch((err: unknown) => { if (!cancelled) setError(err instanceof Error ? err.message : t('toast.searchFailed')); })
       .finally(() => { if (!cancelled) setLoading(false); });
 
     return () => { cancelled = true; };
@@ -1337,7 +1337,7 @@ function ExhibitDetails({ exhibit }: { exhibit: Exhibit }) {
 
   return (
     <>
-      <div className="grid grid-cols-2 gap-x-8 gap-y-4 p-5 text-sm sm:grid-cols-3">
+      <dl className="grid grid-cols-2 gap-x-8 gap-y-4 p-5 text-sm sm:grid-cols-3">
         <Field label={t('exhibit.location')} value={exhibit.location ? (exhibit.location.nameEn ? `${exhibit.location.code} — ${exhibit.location.nameEn}` : exhibit.location.code) : null} />
         <Field label={t('exhibit.site')} value={exhibit.locSite} />
         <Field label={t('exhibit.donor')} value={exhibit.donor?.name} />
@@ -1348,7 +1348,7 @@ function ExhibitDetails({ exhibit }: { exhibit: Exhibit }) {
         <Field label={t('exhibit.acquiredAt')} value={formatDate(exhibit.acquiredAt)} />
         <Field label={t('exhibit.legacyId')} value={exhibit.legacyId} />
         {typeof attrs.legacyOldId === 'string' && <Field label={t('exhibit.oldId')} value={attrs.legacyOldId} />}
-      </div>
+      </dl>
 
       {(exhibit.comment || (showFunctional && exhibit.functionalComment)) && (
         <div className="space-y-3 border-t border-border p-5 text-sm">
@@ -1739,7 +1739,9 @@ export function ExhibitDetailPage() {
     setSaveError(null);
 
     try {
-      const payload = formToPayload(form, exhibit.attributes);
+      const payload: Record<string, unknown> = { ...formToPayload(form, exhibit.attributes) };
+      if (form.validated === exhibit.validated) delete payload.validated;
+      if (form.published === exhibit.published) delete payload.published;
       await updateMutation.mutateAsync(payload);
 
       const origTagIds = exhibit.tags.map((t) => t.id).sort().join(',');
@@ -1750,15 +1752,15 @@ export function ExhibitDetailPage() {
 
       setEditing(false);
       setForm(null);
-    } catch (err: any) {
-      setSaveError(err.message ?? 'Failed to save');
+    } catch (err: unknown) {
+      setSaveError(err instanceof Error ? err.message : 'Failed to save');
     }
   }
 
   if (isLoading) return <div className="py-8 text-center text-muted-foreground">{t('common.loading')}</div>;
   if (error || !exhibit) return <div className="py-8 text-center text-destructive">{t('exhibit.notFound')}</div>;
 
-  const realImages = (exhibit as any).images ?? [];
+  const realImages = (exhibit as Exhibit & { images?: ExhibitImage[] }).images ?? [];
   const demoImages = new URLSearchParams(window.location.search).has('demo')
     ? Array.from({ length: 5 }, (_, i) => ({
         id: `demo-${i}`,
@@ -1767,7 +1769,7 @@ export function ExhibitDetailPage() {
       }))
     : [];
   const exhibitImages = realImages.length > 0
-    ? realImages.map((img: any) => ({ id: img.id, url: img.url, mediumUrl: img.mediumUrl, thumbnailUrl: img.thumbnailUrl, alt: exhibit.exhibitName }))
+    ? realImages.map((img) => ({ id: img.id, url: img.url, mediumUrl: img.mediumUrl, thumbnailUrl: img.thumbnailUrl, alt: exhibit.exhibitName }))
     : demoImages;
   const hasImages = exhibitImages.length > 0;
 
@@ -1979,3 +1981,4 @@ export function ExhibitDetailPage() {
 function formatAttrKey(key: string): string {
   return key.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase());
 }
+

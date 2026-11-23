@@ -6,6 +6,66 @@ import argon2 from 'argon2';
 
 const prisma = new PrismaClient();
 
+function splitPostgresStatements(sql: string): string[] {
+  const statements: string[] = [];
+  let statement = '';
+  let inSingleQuotedString = false;
+  let dollarQuote: string | null = null;
+
+  for (let index = 0; index < sql.length; index += 1) {
+    const character = sql[index];
+
+    if (dollarQuote) {
+      if (sql.startsWith(dollarQuote, index)) {
+        statement += dollarQuote;
+        index += dollarQuote.length - 1;
+        dollarQuote = null;
+      } else {
+        statement += character;
+      }
+      continue;
+    }
+
+    if (inSingleQuotedString) {
+      statement += character;
+      if (character === "'" && sql[index + 1] === "'") {
+        statement += sql[index + 1];
+        index += 1;
+      } else if (character === "'") {
+        inSingleQuotedString = false;
+      }
+      continue;
+    }
+
+    if (character === "'") {
+      inSingleQuotedString = true;
+      statement += character;
+      continue;
+    }
+
+    if (character === '$') {
+      const tag = sql.slice(index).match(/^\$[A-Za-z_][A-Za-z0-9_]*\$|^\$\$/)?.[0];
+      if (tag) {
+        dollarQuote = tag;
+        statement += tag;
+        index += tag.length - 1;
+        continue;
+      }
+    }
+
+    if (character === ';') {
+      if (statement.trim()) statements.push(statement.trim());
+      statement = '';
+    } else {
+      statement += character;
+    }
+  }
+
+  if (statement.trim()) statements.push(statement.trim());
+  if (inSingleQuotedString || dollarQuote) throw new Error('Unterminated string in search-index SQL');
+  return statements;
+}
+
 // ─── Category definitions with JSON Schemas ──────────────────
 
 interface CategoryDef {
@@ -353,15 +413,34 @@ async function main() {
     console.log(`    ✓ Admin already exists: ${existingAdmin.email}`);
   }
 
-  // 4. Apply search indexes (run full SQL file as a single statement)
-  console.log('\n  Search indexes:');
-  try {
-    const searchSql = readFileSync(join(__dirname, 'search-indexes.sql'), 'utf-8');
-    await prisma.$executeRawUnsafe(searchSql);
-    console.log('    ✓ Search tsvector column and GIN indexes created');
-  } catch (err) {
-    console.log(`    ⚠ Search indexes may already exist or require manual setup: ${err}`);
+  const testAccounts = [
+    { email: process.env.SEED_TEST_VIEWER_EMAIL, password: process.env.SEED_TEST_VIEWER_PASSWORD, name: 'SQE Viewer', role: Role.viewer },
+    { email: process.env.SEED_TEST_CURATOR_EMAIL, password: process.env.SEED_TEST_CURATOR_PASSWORD, name: 'SQE Curator', role: Role.curator },
+  ];
+  for (const account of testAccounts) {
+    if (!account.email && !account.password) continue;
+    if (!account.email || !account.password) throw new Error(`Both SEED_TEST_* email and password are required for ${account.role}`);
+    const passwordHash = await argon2.hash(account.password, {
+      type: argon2.argon2id,
+      memoryCost: 65536,
+      timeCost: 3,
+      parallelism: 4,
+    });
+    await prisma.user.upsert({
+      where: { email: account.email },
+      update: { displayName: account.name, passwordHash, role: account.role, langPreference: 'en' },
+      create: { email: account.email, displayName: account.name, passwordHash, role: account.role, langPreference: 'en' },
+    });
+    console.log(`    ✓ SQE ${account.role} account ready: ${account.email}`);
   }
+
+  // 4. Apply search indexes one statement at a time; Prisma's prepared query API
+  // rejects a SQL string containing several top-level commands.
+  console.log('\n  Search indexes:');
+  const searchSql = readFileSync(join(__dirname, 'search-indexes.sql'), 'utf-8');
+  const searchStatements = splitPostgresStatements(searchSql);
+  for (const statement of searchStatements) await prisma.$executeRawUnsafe(statement);
+  console.log(`    ✓ Search infrastructure configured (${searchStatements.length} statements)`);
 
   console.log('\n✅ Seed complete!\n');
 }

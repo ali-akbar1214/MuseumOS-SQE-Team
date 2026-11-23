@@ -1,0 +1,14 @@
+{
+  "result": "PASS",
+  "failureInjection": "real PostgreSQL foreign-key violation during ExhibitsService.update",
+  "failureCode": "P2003",
+  "afterFailure": {
+    "year": 1980,
+    "recordsWithId": 1
+  },
+  "afterRetry": {
+    "year": 2024,
+    "recordsWithId": 1
+  },
+  "fixtureCleanup": "physical fixture delete in finally block"
+}

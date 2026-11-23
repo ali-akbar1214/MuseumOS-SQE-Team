@@ -1,0 +1,365 @@
+{
+  "generatedFrom": "docs\\team\\evidence\\api\\constraint-change\\openapi-changed.yaml",
+  "openapiVersion": "3.0.3",
+  "schema": "CreateExhibit",
+  "generatedAt": "2026-11-23T19:56:01.932Z",
+  "properties": {
+    "categoryId": {
+      "required": true,
+      "type": "string",
+      "cases": [
+        {
+          "exists": true,
+          "value": "__CATEGORY_ID__",
+          "valid": true,
+          "partitions": [
+            "valid-uuid"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        },
+        {
+          "exists": true,
+          "value": "not-a-uuid",
+          "valid": false,
+          "partitions": [
+            "invalid-format"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        },
+        {
+          "exists": true,
+          "value": 42,
+          "valid": false,
+          "partitions": [
+            "wrong-type-number"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        },
+        {
+          "exists": false,
+          "value": null,
+          "valid": false,
+          "partitions": [
+            "missing-required"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        }
+      ]
+    },
+    "exhibitName": {
+      "required": true,
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120,
+      "cases": [
+        {
+          "exists": true,
+          "value": "x",
+          "valid": true,
+          "partitions": [
+            "valid-minimum",
+            "length-1"
+          ],
+          "techniques": [
+            "EP",
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+          "valid": true,
+          "partitions": [
+            "valid-maximum",
+            "length-120"
+          ],
+          "techniques": [
+            "EP",
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": "",
+          "valid": false,
+          "partitions": [
+            "invalid-too-short",
+            "length-0"
+          ],
+          "techniques": [
+            "EP",
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+          "valid": false,
+          "partitions": [
+            "invalid-too-long",
+            "length-121"
+          ],
+          "techniques": [
+            "EP",
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": "xx",
+          "valid": true,
+          "partitions": [
+            "length-2"
+          ],
+          "techniques": [
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+          "valid": true,
+          "partitions": [
+            "length-119"
+          ],
+          "techniques": [
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": 42,
+          "valid": false,
+          "partitions": [
+            "wrong-type-number"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        },
+        {
+          "exists": false,
+          "value": null,
+          "valid": false,
+          "partitions": [
+            "missing-required"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        }
+      ]
+    },
+    "year": {
+      "required": false,
+      "type": "integer",
+      "minimum": 1810,
+      "maximum": 2090,
+      "cases": [
+        {
+          "exists": true,
+          "value": 1809,
+          "valid": false,
+          "partitions": [
+            "invalid-below-minimum",
+            "value-1809"
+          ],
+          "techniques": [
+            "EP",
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": 1810,
+          "valid": true,
+          "partitions": [
+            "valid-lower-boundary",
+            "value-1810"
+          ],
+          "techniques": [
+            "EP",
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": 1950,
+          "valid": true,
+          "partitions": [
+            "valid-middle"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        },
+        {
+          "exists": true,
+          "value": 2090,
+          "valid": true,
+          "partitions": [
+            "valid-upper-boundary",
+            "value-2090"
+          ],
+          "techniques": [
+            "EP",
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": 2091,
+          "valid": false,
+          "partitions": [
+            "invalid-above-maximum",
+            "value-2091"
+          ],
+          "techniques": [
+            "EP",
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": 1811,
+          "valid": true,
+          "partitions": [
+            "value-1811"
+          ],
+          "techniques": [
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": 2089,
+          "valid": true,
+          "partitions": [
+            "value-2089"
+          ],
+          "techniques": [
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": 1810.5,
+          "valid": false,
+          "partitions": [
+            "invalid-non-integer"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        },
+        {
+          "exists": true,
+          "value": null,
+          "valid": true,
+          "partitions": [
+            "valid-null"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        },
+        {
+          "exists": true,
+          "value": "not-a-number",
+          "valid": false,
+          "partitions": [
+            "wrong-type-string"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        }
+      ]
+    },
+    "collectiblePrice": {
+      "required": false,
+      "type": "number",
+      "minimum": 0,
+      "cases": [
+        {
+          "exists": true,
+          "value": -1,
+          "valid": false,
+          "partitions": [
+            "invalid-below-minimum"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        },
+        {
+          "exists": true,
+          "value": 0,
+          "valid": true,
+          "partitions": [
+            "valid-at-minimum",
+            "value-0"
+          ],
+          "techniques": [
+            "EP",
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": 0.01,
+          "valid": true,
+          "partitions": [
+            "valid-above-minimum",
+            "value-0.01"
+          ],
+          "techniques": [
+            "EP",
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": -0.01,
+          "valid": false,
+          "partitions": [
+            "value--0.01"
+          ],
+          "techniques": [
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": null,
+          "valid": true,
+          "partitions": [
+            "valid-null"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        },
+        {
+          "exists": true,
+          "value": "not-a-number",
+          "valid": false,
+          "partitions": [
+            "wrong-type-string"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        }
+      ]
+    }
+  }
+}

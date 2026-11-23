@@ -14,6 +14,7 @@ import {
   HttpCode,
   HttpStatus,
   BadRequestException,
+  ForbiddenException,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
@@ -150,7 +151,7 @@ export class ExhibitsController {
     // use the lighter findMatchingIds.
     if (parsed.data.q) {
       const rows = await this.searchService.exportRows(parsed.data);
-      const ids = rows.map((r: any) => r.id).filter(Boolean).slice(0, 500);
+      const ids = rows.map((r: { id?: string }) => r.id).filter(Boolean).slice(0, 500);
       return { ids, total: rows.length, capped: rows.length > 500 };
     }
     const ids = await this.exhibitsService.findMatchingIds(parsed.data, 500);
@@ -230,7 +231,12 @@ export class ExhibitsController {
     if (!parsed.success) throw new BadRequestException(parsed.error.flatten());
 
     const before = await this.exhibitsService.findById(id);
-    if (parsed.data.validated !== undefined || parsed.data.published !== undefined) {
+    const validatedChanged = parsed.data.validated !== undefined && parsed.data.validated !== before.validated;
+    const publishedChanged = parsed.data.published !== undefined && parsed.data.published !== before.published;
+    if (validatedChanged || publishedChanged) {
+      if (actor.role !== 'admin' && !actor.permissions.includes('exhibit:validate')) {
+        throw new ForbiddenException('Missing permission: exhibit:validate');
+      }
       const transition = validateExhibitTransition({
         exhibitName: parsed.data.exhibitName ?? before.exhibitName,
         categoryId: parsed.data.categoryId ?? before.categoryId,

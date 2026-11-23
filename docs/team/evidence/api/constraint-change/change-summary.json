@@ -1,0 +1,48 @@
+{
+  "changedConstraints": [
+    {
+      "field": "CreateExhibit.year",
+      "change": "minimum 1800 -> 1810, maximum 2100 -> 2090",
+      "baselineBva": [
+        1799,
+        1800,
+        2100,
+        2101,
+        1801,
+        2099
+      ],
+      "changedBva": [
+        1809,
+        1810,
+        2090,
+        2091,
+        1811,
+        2089
+      ]
+    },
+    {
+      "field": "CreateExhibit.exhibitName",
+      "change": "maxLength 500 -> 120",
+      "baselineBvaLengths": [
+        1,
+        500,
+        0,
+        501,
+        2,
+        499
+      ],
+      "changedBvaLengths": [
+        1,
+        120,
+        0,
+        121,
+        2,
+        119
+      ]
+    }
+  ],
+  "proof": {
+    "changedSpecification": "docs\\team\\evidence\\api\\constraint-change\\openapi-changed.yaml",
+    "regeneratedCases": "docs\\team\\evidence\\api\\constraint-change\\api-generated-cases-changed.json"
+  }
+}

@@ -1,0 +1,365 @@
+{
+  "generatedFrom": "docs\\team\\planning\\openapi.yaml",
+  "openapiVersion": "3.0.3",
+  "schema": "CreateExhibit",
+  "generatedAt": "2026-11-23T20:09:11.635Z",
+  "properties": {
+    "categoryId": {
+      "required": true,
+      "type": "string",
+      "cases": [
+        {
+          "exists": true,
+          "value": "__CATEGORY_ID__",
+          "valid": true,
+          "partitions": [
+            "valid-uuid"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        },
+        {
+          "exists": true,
+          "value": "not-a-uuid",
+          "valid": false,
+          "partitions": [
+            "invalid-format"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        },
+        {
+          "exists": true,
+          "value": 42,
+          "valid": false,
+          "partitions": [
+            "wrong-type-number"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        },
+        {
+          "exists": false,
+          "value": null,
+          "valid": false,
+          "partitions": [
+            "missing-required"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        }
+      ]
+    },
+    "exhibitName": {
+      "required": true,
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500,
+      "cases": [
+        {
+          "exists": true,
+          "value": "x",
+          "valid": true,
+          "partitions": [
+            "valid-minimum",
+            "length-1"
+          ],
+          "techniques": [
+            "EP",
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+          "valid": true,
+          "partitions": [
+            "valid-maximum",
+            "length-500"
+          ],
+          "techniques": [
+            "EP",
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": "",
+          "valid": false,
+          "partitions": [
+            "invalid-too-short",
+            "length-0"
+          ],
+          "techniques": [
+            "EP",
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+          "valid": false,
+          "partitions": [
+            "invalid-too-long",
+            "length-501"
+          ],
+          "techniques": [
+            "EP",
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": "xx",
+          "valid": true,
+          "partitions": [
+            "length-2"
+          ],
+          "techniques": [
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+          "valid": true,
+          "partitions": [
+            "length-499"
+          ],
+          "techniques": [
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": 42,
+          "valid": false,
+          "partitions": [
+            "wrong-type-number"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        },
+        {
+          "exists": false,
+          "value": null,
+          "valid": false,
+          "partitions": [
+            "missing-required"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        }
+      ]
+    },
+    "year": {
+      "required": false,
+      "type": "integer",
+      "minimum": 1800,
+      "maximum": 2100,
+      "cases": [
+        {
+          "exists": true,
+          "value": 1799,
+          "valid": false,
+          "partitions": [
+            "invalid-below-minimum",
+            "value-1799"
+          ],
+          "techniques": [
+            "EP",
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": 1800,
+          "valid": true,
+          "partitions": [
+            "valid-lower-boundary",
+            "value-1800"
+          ],
+          "techniques": [
+            "EP",
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": 1950,
+          "valid": true,
+          "partitions": [
+            "valid-middle"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        },
+        {
+          "exists": true,
+          "value": 2100,
+          "valid": true,
+          "partitions": [
+            "valid-upper-boundary",
+            "value-2100"
+          ],
+          "techniques": [
+            "EP",
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": 2101,
+          "valid": false,
+          "partitions": [
+            "invalid-above-maximum",
+            "value-2101"
+          ],
+          "techniques": [
+            "EP",
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": 1801,
+          "valid": true,
+          "partitions": [
+            "value-1801"
+          ],
+          "techniques": [
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": 2099,
+          "valid": true,
+          "partitions": [
+            "value-2099"
+          ],
+          "techniques": [
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": 1800.5,
+          "valid": false,
+          "partitions": [
+            "invalid-non-integer"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        },
+        {
+          "exists": true,
+          "value": null,
+          "valid": true,
+          "partitions": [
+            "valid-null"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        },
+        {
+          "exists": true,
+          "value": "not-a-number",
+          "valid": false,
+          "partitions": [
+            "wrong-type-string"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        }
+      ]
+    },
+    "collectiblePrice": {
+      "required": false,
+      "type": "number",
+      "minimum": 0,
+      "cases": [
+        {
+          "exists": true,
+          "value": -1,
+          "valid": false,
+          "partitions": [
+            "invalid-below-minimum"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        },
+        {
+          "exists": true,
+          "value": 0,
+          "valid": true,
+          "partitions": [
+            "valid-at-minimum",
+            "value-0"
+          ],
+          "techniques": [
+            "EP",
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": 0.01,
+          "valid": true,
+          "partitions": [
+            "valid-above-minimum",
+            "value-0.01"
+          ],
+          "techniques": [
+            "EP",
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": -0.01,
+          "valid": false,
+          "partitions": [
+            "value--0.01"
+          ],
+          "techniques": [
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": null,
+          "valid": true,
+          "partitions": [
+            "valid-null"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        },
+        {
+          "exists": true,
+          "value": "not-a-number",
+          "valid": false,
+          "partitions": [
+            "wrong-type-string"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -22,7 +22,9 @@ npm-debug.log*
 pnpm-debug.log*
 
 # Testing
-coverage/
+/coverage/
+apps/*/coverage/
+packages/*/coverage/
 
 # Build
 *.js.map
@@ -71,3 +73,10 @@ minio-data/
 cookies.txt
 *.cookies
 scripts/pi-mirror/pi-local-users.sql
+
+# SQE generated outputs & local scratch
+__pycache__/
+*.pyc
+work/
+test-results/
+.stryker-tmp/

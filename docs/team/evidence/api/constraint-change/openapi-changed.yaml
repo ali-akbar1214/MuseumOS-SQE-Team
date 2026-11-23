@@ -1,0 +1,96 @@
+openapi: 3.0.3
+info:
+  title: MuseumOS Team Exhibit API
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/api
+paths:
+  /exhibits:
+    post:
+      summary: Create exhibit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateExhibit"
+      responses:
+        "201":
+          description: Exhibit created
+        "400":
+          description: Invalid input
+  /exhibits/{id}:
+    get:
+      parameters:
+        - $ref: "#/components/parameters/ExhibitId"
+      responses:
+        "200":
+          description: Exhibit
+        "404":
+          description: Not found
+    patch:
+      parameters:
+        - $ref: "#/components/parameters/ExhibitId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateExhibit"
+      responses:
+        "200":
+          description: Exhibit updated
+        "400":
+          description: Invalid transition or input
+components:
+  parameters:
+    ExhibitId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    CreateExhibit:
+      type: object
+      required:
+        - categoryId
+        - exhibitName
+      properties:
+        categoryId:
+          type: string
+          format: uuid
+        exhibitName:
+          type: string
+          minLength: 1
+          maxLength: 120
+        year:
+          type: integer
+          minimum: 1810
+          maximum: 2090
+          nullable: true
+        collectiblePrice:
+          type: number
+          minimum: 0
+          nullable: true
+    UpdateExhibit:
+      type: object
+      properties:
+        exhibitName:
+          type: string
+          minLength: 1
+          maxLength: 500
+        year:
+          type: integer
+          minimum: 1800
+          maximum: 2100
+          nullable: true
+        collectiblePrice:
+          type: number
+          minimum: 0
+          nullable: true
+        validated:
+          type: boolean
+        published:
+          type: boolean

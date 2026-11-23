@@ -1,0 +1,859 @@
+{
+  "baseline": {
+    "commit": "0ef7004ebef1c59130101fa0a56c95a50ca31900",
+    "runId": "SQE-1795464551761"
+  },
+  "setup": {
+    "login": 200,
+    "health": 200,
+    "categoryCount": 16,
+    "unauthenticatedRead": 401,
+    "viewerAccess": {
+      "login": 200,
+      "create": 403
+    }
+  },
+  "created": {
+    "status": 201,
+    "id": "c31b2129-9153-4daf-a7bd-632390118994",
+    "displayId": "BK00015"
+  },
+  "generatedCases": {
+    "source": "docs\\team\\planning\\openapi.yaml",
+    "total": 62,
+    "outcomes": [
+      {
+        "operation": "GET",
+        "caseId": "API-AUTH-401",
+        "expected": 401,
+        "observed": 401
+      },
+      {
+        "operation": "POST",
+        "caseId": "API-POST-EXHIBITNAME-1",
+        "field": "exhibitName",
+        "partitions": [
+          "valid-minimum",
+          "length-1"
+        ],
+        "techniques": [
+          "EP",
+          "3-point BVA"
+        ],
+        "expected": 201,
+        "observed": 201
+      },
+      {
+        "operation": "POST",
+        "caseId": "API-POST-EXHIBITNAME-2",
+        "field": "exhibitName",
+        "partitions": [
+          "valid-maximum",
+          "length-500"
+        ],
+        "techniques": [
+          "EP",
+          "3-point BVA"
+        ],
+        "expected": 201,
+        "observed": 201
+      },
+      {
+        "operation": "POST",
+        "caseId": "API-POST-EXHIBITNAME-3",
+        "field": "exhibitName",
+        "partitions": [
+          "invalid-too-short",
+          "length-0"
+        ],
+        "techniques": [
+          "EP",
+          "3-point BVA"
+        ],
+        "expected": 400,
+        "observed": 400
+      },
+      {
+        "operation": "POST",
+        "caseId": "API-POST-EXHIBITNAME-4",
+        "field": "exhibitName",
+        "partitions": [
+          "invalid-too-long",
+          "length-501"
+        ],
+        "techniques": [
+          "EP",
+          "3-point BVA"
+        ],
+        "expected": 400,
+        "observed": 400
+      },
+      {
+        "operation": "POST",
+        "caseId": "API-POST-EXHIBITNAME-5",
+        "field": "exhibitName",
+        "partitions": [
+          "length-2"
+        ],
+        "techniques": [
+          "3-point BVA"
+        ],
+        "expected": 201,
+        "observed": 201
+      },
+      {
+        "operation": "POST",
+        "caseId": "API-POST-EXHIBITNAME-6",
+        "field": "exhibitName",
+        "partitions": [
+          "length-499"
+        ],
+        "techniques": [
+          "3-point BVA"
+        ],
+        "expected": 201,
+        "observed": 201
+      },
+      {
+        "operation": "POST",
+        "caseId": "API-POST-EXHIBITNAME-7",
+        "field": "exhibitName",
+        "partitions": [
+          "wrong-type-number"
+        ],
+        "techniques": [
+          "EP"
+        ],
+        "expected": 400,
+        "observed": 400
+      },
+      {
+        "operation": "POST",
+        "caseId": "API-POST-EXHIBITNAME-8",
+        "field": "exhibitName",
+        "partitions": [
+          "missing-required"
+        ],
+        "techniques": [
+          "EP"
+        ],
+        "expected": 400,
+        "observed": 400
+      },
+      {
+        "operation": "POST",
+        "caseId": "API-POST-CATEGORYID-9",
+        "field": "categoryId",
+        "partitions": [
+          "valid-uuid"
+        ],
+        "techniques": [
+          "EP"
+        ],
+        "expected": 201,
+        "observed": 201
+      },
+      {
+        "operation": "POST",
+        "caseId": "API-POST-CATEGORYID-10",
+        "field": "categoryId",
+        "partitions": [
+          "invalid-format"
+        ],
+        "techniques": [
+          "EP"
+        ],
+        "expected": 400,
+        "observed": 400
+      },
+      {
+        "operation": "POST",
+        "caseId": "API-POST-CATEGORYID-11",
+        "field": "categoryId",
+        "partitions": [
+          "wrong-type-number"
+        ],
+        "techniques": [
+          "EP"
+        ],
+        "expected": 400,
+        "observed": 400
+      },
+      {
+        "operation": "POST",
+        "caseId": "API-POST-CATEGORYID-12",
+        "field": "categoryId",
+        "partitions": [
+          "missing-required"
+        ],
+        "techniques": [
+          "EP"
+        ],
+        "expected": 400,
+        "observed": 400
+      },
+      {
+        "operation": "POST",
+        "caseId": "API-POST-YEAR-13",
+        "field": "year",
+        "partitions": [
+          "invalid-below-minimum",
+          "value-1799"
+        ],
+        "techniques": [
+          "EP",
+          "3-point BVA"
+        ],
+        "expected": 400,
+        "observed": 400
+      },
+      {
+        "operation": "POST",
+        "caseId": "API-POST-YEAR-14",
+        "field": "year",
+        "partitions": [
+          "valid-lower-boundary",
+          "value-1800"
+        ],
+        "techniques": [
+          "EP",
+          "3-point BVA"
+        ],
+        "expected": 201,
+        "observed": 201
+      },
+      {
+        "operation": "POST",
+        "caseId": "API-POST-YEAR-15",
+        "field": "year",
+        "partitions": [
+          "valid-middle"
+        ],
+        "techniques": [
+          "EP"
+        ],
+        "expected": 201,
+        "observed": 201
+      },
+      {
+        "operation": "POST",
+        "caseId": "API-POST-YEAR-16",
+        "field": "year",
+        "partitions": [
+          "valid-upper-boundary",
+          "value-2100"
+        ],
+        "techniques": [
+          "EP",
+          "3-point BVA"
+        ],
+        "expected": 201,
+        "observed": 201
+      },
+      {
+        "operation": "POST",
+        "caseId": "API-POST-YEAR-17",
+        "field": "year",
+        "partitions": [
+          "invalid-above-maximum",
+          "value-2101"
+        ],
+        "techniques": [
+          "EP",
+          "3-point BVA"
+        ],
+        "expected": 400,
+        "observed": 400
+      },
+      {
+        "operation": "POST",
+        "caseId": "API-POST-YEAR-18",
+        "field": "year",
+        "partitions": [
+          "value-1801"
+        ],
+        "techniques": [
+          "3-point BVA"
+        ],
+        "expected": 201,
+        "observed": 201
+      },
+      {
+        "operation": "POST",
+        "caseId": "API-POST-YEAR-19",
+        "field": "year",
+        "partitions": [
+          "value-2099"
+        ],
+        "techniques": [
+          "3-point BVA"
+        ],
+        "expected": 201,
+        "observed": 201
+      },
+      {
+        "operation": "POST",
+        "caseId": "API-POST-YEAR-20",
+        "field": "year",
+        "partitions": [
+          "invalid-non-integer"
+        ],
+        "techniques": [
+          "EP"
+        ],
+        "expected": 400,
+        "observed": 400
+      },
+      {
+        "operation": "POST",
+        "caseId": "API-POST-YEAR-21",
+        "field": "year",
+        "partitions": [
+          "valid-null"
+        ],
+        "techniques": [
+          "EP"
+        ],
+        "expected": 201,
+        "observed": 201
+      },
+      {
+        "operation": "POST",
+        "caseId": "API-POST-YEAR-22",
+        "field": "year",
+        "partitions": [
+          "wrong-type-string"
+        ],
+        "techniques": [
+          "EP"
+        ],
+        "expected": 400,
+        "observed": 400
+      },
+      {
+        "operation": "POST",
+        "caseId": "API-POST-COLLECTIBLEPRICE-23",
+        "field": "collectiblePrice",
+        "partitions": [
+          "invalid-below-minimum"
+        ],
+        "techniques": [
+          "EP"
+        ],
+        "expected": 400,
+        "observed": 400
+      },
+      {
+        "operation": "POST",
+        "caseId": "API-POST-COLLECTIBLEPRICE-24",
+        "field": "collectiblePrice",
+        "partitions": [
+          "valid-at-minimum",
+          "value-0"
+        ],
+        "techniques": [
+          "EP",
+          "3-point BVA"
+        ],
+        "expected": 201,
+        "observed": 201
+      },
+      {
+        "operation": "POST",
+        "caseId": "API-POST-COLLECTIBLEPRICE-25",
+        "field": "collectiblePrice",
+        "partitions": [
+          "valid-above-minimum",
+          "value-0.01"
+        ],
+        "techniques": [
+          "EP",
+          "3-point BVA"
+        ],
+        "expected": 201,
+        "observed": 201
+      },
+      {
+        "operation": "POST",
+        "caseId": "API-POST-COLLECTIBLEPRICE-26",
+        "field": "collectiblePrice",
+        "partitions": [
+          "value--0.01"
+        ],
+        "techniques": [
+          "3-point BVA"
+        ],
+        "expected": 400,
+        "observed": 400
+      },
+      {
+        "operation": "POST",
+        "caseId": "API-POST-COLLECTIBLEPRICE-27",
+        "field": "collectiblePrice",
+        "partitions": [
+          "valid-null"
+        ],
+        "techniques": [
+          "EP"
+        ],
+        "expected": 201,
+        "observed": 201
+      },
+      {
+        "operation": "POST",
+        "caseId": "API-POST-COLLECTIBLEPRICE-28",
+        "field": "collectiblePrice",
+        "partitions": [
+          "wrong-type-string"
+        ],
+        "techniques": [
+          "EP"
+        ],
+        "expected": 400,
+        "observed": 400
+      },
+      {
+        "operation": "POST",
+        "caseId": "API-POST-READBACK-01",
+        "expected": 201,
+        "observed": 201,
+        "readback": "verified below"
+      },
+      {
+        "operation": "PATCH",
+        "caseId": "API-PATCH-EXHIBITNAME-1",
+        "field": "exhibitName",
+        "partitions": [
+          "valid-minimum",
+          "length-1"
+        ],
+        "techniques": [
+          "EP",
+          "3-point BVA"
+        ],
+        "expected": 200,
+        "observed": 200,
+        "readback": "x"
+      },
+      {
+        "operation": "PATCH",
+        "caseId": "API-PATCH-EXHIBITNAME-2",
+        "field": "exhibitName",
+        "partitions": [
+          "valid-maximum",
+          "length-500"
+        ],
+        "techniques": [
+          "EP",
+          "3-point BVA"
+        ],
+        "expected": 200,
+        "observed": 200,
+        "readback": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      },
+      {
+        "operation": "PATCH",
+        "caseId": "API-PATCH-EXHIBITNAME-3",
+        "field": "exhibitName",
+        "partitions": [
+          "invalid-too-short",
+          "length-0"
+        ],
+        "techniques": [
+          "EP",
+          "3-point BVA"
+        ],
+        "expected": 400,
+        "observed": 400,
+        "readback": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      },
+      {
+        "operation": "PATCH",
+        "caseId": "API-PATCH-EXHIBITNAME-4",
+        "field": "exhibitName",
+        "partitions": [
+          "invalid-too-long",
+          "length-501"
+        ],
+        "techniques": [
+          "EP",
+          "3-point BVA"
+        ],
+        "expected": 400,
+        "observed": 400,
+        "readback": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      },
+      {
+        "operation": "PATCH",
+        "caseId": "API-PATCH-EXHIBITNAME-5",
+        "field": "exhibitName",
+        "partitions": [
+          "length-2"
+        ],
+        "techniques": [
+          "3-point BVA"
+        ],
+        "expected": 200,
+        "observed": 200,
+        "readback": "xx"
+      },
+      {
+        "operation": "PATCH",
+        "caseId": "API-PATCH-EXHIBITNAME-6",
+        "field": "exhibitName",
+        "partitions": [
+          "length-499"
+        ],
+        "techniques": [
+          "3-point BVA"
+        ],
+        "expected": 200,
+        "observed": 200,
+        "readback": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      },
+      {
+        "operation": "PATCH",
+        "caseId": "API-PATCH-EXHIBITNAME-7",
+        "field": "exhibitName",
+        "partitions": [
+          "wrong-type-number"
+        ],
+        "techniques": [
+          "EP"
+        ],
+        "expected": 400,
+        "observed": 400,
+        "readback": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      },
+      {
+        "operation": "PATCH",
+        "caseId": "API-PATCH-CATEGORYID-8",
+        "field": "categoryId",
+        "partitions": [
+          "valid-uuid"
+        ],
+        "techniques": [
+          "EP"
+        ],
+        "expected": 200,
+        "observed": 200,
+        "readback": "82f9ed20-238e-4a21-bbdb-c9098591f098"
+      },
+      {
+        "operation": "PATCH",
+        "caseId": "API-PATCH-CATEGORYID-9",
+        "field": "categoryId",
+        "partitions": [
+          "invalid-format"
+        ],
+        "techniques": [
+          "EP"
+        ],
+        "expected": 400,
+        "observed": 400,
+        "readback": "82f9ed20-238e-4a21-bbdb-c9098591f098"
+      },
+      {
+        "operation": "PATCH",
+        "caseId": "API-PATCH-CATEGORYID-10",
+        "field": "categoryId",
+        "partitions": [
+          "wrong-type-number"
+        ],
+        "techniques": [
+          "EP"
+        ],
+        "expected": 400,
+        "observed": 400,
+        "readback": "82f9ed20-238e-4a21-bbdb-c9098591f098"
+      },
+      {
+        "operation": "PATCH",
+        "caseId": "API-PATCH-YEAR-11",
+        "field": "year",
+        "partitions": [
+          "invalid-below-minimum",
+          "value-1799"
+        ],
+        "techniques": [
+          "EP",
+          "3-point BVA"
+        ],
+        "expected": 400,
+        "observed": 400,
+        "readback": 2000
+      },
+      {
+        "operation": "PATCH",
+        "caseId": "API-PATCH-YEAR-12",
+        "field": "year",
+        "partitions": [
+          "valid-lower-boundary",
+          "value-1800"
+        ],
+        "techniques": [
+          "EP",
+          "3-point BVA"
+        ],
+        "expected": 200,
+        "observed": 200,
+        "readback": 1800
+      },
+      {
+        "operation": "PATCH",
+        "caseId": "API-PATCH-YEAR-13",
+        "field": "year",
+        "partitions": [
+          "valid-middle"
+        ],
+        "techniques": [
+          "EP"
+        ],
+        "expected": 200,
+        "observed": 200,
+        "readback": 1950
+      },
+      {
+        "operation": "PATCH",
+        "caseId": "API-PATCH-YEAR-14",
+        "field": "year",
+        "partitions": [
+          "valid-upper-boundary",
+          "value-2100"
+        ],
+        "techniques": [
+          "EP",
+          "3-point BVA"
+        ],
+        "expected": 200,
+        "observed": 200,
+        "readback": 2100
+      },
+      {
+        "operation": "PATCH",
+        "caseId": "API-PATCH-YEAR-15",
+        "field": "year",
+        "partitions": [
+          "invalid-above-maximum",
+          "value-2101"
+        ],
+        "techniques": [
+          "EP",
+          "3-point BVA"
+        ],
+        "expected": 400,
+        "observed": 400,
+        "readback": 2100
+      },
+      {
+        "operation": "PATCH",
+        "caseId": "API-PATCH-YEAR-16",
+        "field": "year",
+        "partitions": [
+          "value-1801"
+        ],
+        "techniques": [
+          "3-point BVA"
+        ],
+        "expected": 200,
+        "observed": 200,
+        "readback": 1801
+      },
+      {
+        "operation": "PATCH",
+        "caseId": "API-PATCH-YEAR-17",
+        "field": "year",
+        "partitions": [
+          "value-2099"
+        ],
+        "techniques": [
+          "3-point BVA"
+        ],
+        "expected": 200,
+        "observed": 200,
+        "readback": 2099
+      },
+      {
+        "operation": "PATCH",
+        "caseId": "API-PATCH-YEAR-18",
+        "field": "year",
+        "partitions": [
+          "invalid-non-integer"
+        ],
+        "techniques": [
+          "EP"
+        ],
+        "expected": 400,
+        "observed": 400,
+        "readback": 2099
+      },
+      {
+        "operation": "PATCH",
+        "caseId": "API-PATCH-YEAR-19",
+        "field": "year",
+        "partitions": [
+          "valid-null"
+        ],
+        "techniques": [
+          "EP"
+        ],
+        "expected": 200,
+        "observed": 200,
+        "readback": null
+      },
+      {
+        "operation": "PATCH",
+        "caseId": "API-PATCH-YEAR-20",
+        "field": "year",
+        "partitions": [
+          "wrong-type-string"
+        ],
+        "techniques": [
+          "EP"
+        ],
+        "expected": 400,
+        "observed": 400,
+        "readback": null
+      },
+      {
+        "operation": "PATCH",
+        "caseId": "API-PATCH-COLLECTIBLEPRICE-21",
+        "field": "collectiblePrice",
+        "partitions": [
+          "invalid-below-minimum"
+        ],
+        "techniques": [
+          "EP"
+        ],
+        "expected": 400,
+        "observed": 400,
+        "readback": "25"
+      },
+      {
+        "operation": "PATCH",
+        "caseId": "API-PATCH-COLLECTIBLEPRICE-22",
+        "field": "collectiblePrice",
+        "partitions": [
+          "valid-at-minimum",
+          "value-0"
+        ],
+        "techniques": [
+          "EP",
+          "3-point BVA"
+        ],
+        "expected": 200,
+        "observed": 200,
+        "readback": "0"
+      },
+      {
+        "operation": "PATCH",
+        "caseId": "API-PATCH-COLLECTIBLEPRICE-23",
+        "field": "collectiblePrice",
+        "partitions": [
+          "valid-above-minimum",
+          "value-0.01"
+        ],
+        "techniques": [
+          "EP",
+          "3-point BVA"
+        ],
+        "expected": 200,
+        "observed": 200,
+        "readback": "0.01"
+      },
+      {
+        "operation": "PATCH",
+        "caseId": "API-PATCH-COLLECTIBLEPRICE-24",
+        "field": "collectiblePrice",
+        "partitions": [
+          "value--0.01"
+        ],
+        "techniques": [
+          "3-point BVA"
+        ],
+        "expected": 400,
+        "observed": 400,
+        "readback": "0.01"
+      },
+      {
+        "operation": "PATCH",
+        "caseId": "API-PATCH-COLLECTIBLEPRICE-25",
+        "field": "collectiblePrice",
+        "partitions": [
+          "valid-null"
+        ],
+        "techniques": [
+          "EP"
+        ],
+        "expected": 200,
+        "observed": 200,
+        "readback": null
+      },
+      {
+        "operation": "PATCH",
+        "caseId": "API-PATCH-COLLECTIBLEPRICE-26",
+        "field": "collectiblePrice",
+        "partitions": [
+          "wrong-type-string"
+        ],
+        "techniques": [
+          "EP"
+        ],
+        "expected": 400,
+        "observed": 400,
+        "readback": null
+      },
+      {
+        "operation": "PATCH",
+        "caseId": "API-LIFECYCLE-REJECT-01",
+        "expected": 400,
+        "observed": 400
+      },
+      {
+        "operation": "PATCH",
+        "caseId": "API-LIFECYCLE-VALIDATE-01",
+        "expected": 200,
+        "observed": 200
+      },
+      {
+        "operation": "PATCH",
+        "caseId": "API-LIFECYCLE-PUBLISH-01",
+        "expected": 200,
+        "observed": 200
+      },
+      {
+        "operation": "PATCH",
+        "caseId": "API-LIFECYCLE-PUBLISHED-TO-DRAFT",
+        "expected": 400,
+        "observed": 400
+      },
+      {
+        "operation": "GET",
+        "caseId": "API-EXHIBIT-404",
+        "expected": 404,
+        "observed": 404
+      },
+      {
+        "operation": "POST",
+        "caseId": "API-AUTH-403-CREATE",
+        "expected": 403,
+        "observed": 403
+      }
+    ]
+  },
+  "lifecycle": {
+    "rejectedPublish": 400,
+    "validate": 200,
+    "publish": 200,
+    "repeatedPublish": 200,
+    "recordsWithId": 1,
+    "final": {
+      "validated": true,
+      "published": true
+    }
+  },
+  "cleanup": {
+    "softDelete": 204,
+    "testRecordId": "c31b2129-9153-4daf-a7bd-632390118994"
+  }
+}
