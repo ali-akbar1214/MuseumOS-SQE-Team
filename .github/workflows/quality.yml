@@ -2,6 +2,8 @@ name: SQE quality gate
 
 on:
   pull_request:
+  push:
+    branches: [main]
 
 permissions:
   contents: read
@@ -9,18 +11,111 @@ permissions:
 jobs:
   quality:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: museumos
+          POSTGRES_PASSWORD: museumos_ci_password
+          POSTGRES_DB: museumos
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U museumos -d museumos"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      DATABASE_URL: postgresql://museumos:museumos_ci_password@localhost:5432/museumos
+      SESSION_SECRET: ci-quality-gate-session-secret-0123456789abcdef
+      SEED_ADMIN_EMAIL: ci-admin@museumos.test
+      SEED_ADMIN_PASSWORD: CiAdminPassword!2026
+      SEED_TEST_VIEWER_EMAIL: ci-viewer@museumos.test
+      SEED_TEST_VIEWER_PASSWORD: CiViewerPassword!2026
+      SEED_TEST_CURATOR_EMAIL: ci-curator@museumos.test
+      SEED_TEST_CURATOR_PASSWORD: CiCuratorPassword!2026
+      TEST_ADMIN_EMAIL: ci-admin@museumos.test
+      TEST_ADMIN_PASSWORD: CiAdminPassword!2026
+      TEST_VIEWER_EMAIL: ci-viewer@museumos.test
+      TEST_VIEWER_PASSWORD: CiViewerPassword!2026
+      TEST_CURATOR_EMAIL: ci-curator@museumos.test
+      TEST_CURATOR_PASSWORD: CiCuratorPassword!2026
+      API_URL: http://localhost:3000/api
+      WEB_URL: http://localhost:5173
+      BASELINE_COMMIT: 0ef7004ebef1c59130101fa0a56c95a50ca31900
+
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - uses: pnpm/action-setup@v4
         with:
           version: 10.33.2
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm db:generate
-      - run: pnpm test:team
-      - run: pnpm --filter @museumos/api exec vitest run test/team --coverage
-      - run: pnpm build
-      - run: pnpm lint
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client and migrate/seed CI database
+        run: |
+          pnpm db:generate
+          pnpm --filter @museumos/db migrate:deploy
+          pnpm db:seed
+
+      - name: Workspace ESLint gate
+        run: pnpm lint
+
+      - name: Workspace TypeScript & production build gate
+        run: pnpm build
+
+      - name: White-box unit & 100% lifecycle coverage gate
+        run: pnpm --filter @museumos/api exec vitest run test/team --coverage
+
+      - name: Custom domain mutation gate (100% required)
+        run: pnpm test:mutation:custom
+
+      - name: Stryker mutation testing gate (>=80% required)
+        run: pnpm test:mutation
+
+      - name: OpenAPI generator & two-constraint proof
+        run: pnpm test:data:constraints
+
+      - name: SonarCloud static analysis & quality gate
+        if: ${{ secrets.SONAR_TOKEN != '' }}
+        uses: SonarSource/sonarqube-scan-action@v4
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.qualitygate.wait=true
+            -Dsonar.typescript.tsconfigPath=sonar/tsconfig.sonar.json
+            -Dsonar.javascript.lcov.reportPaths=apps/api/coverage/lcov.info
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Start API and Web servers, then run live API, DB recovery, and E2E suites
+        run: |
+          NODE_PATH="$PWD/node_modules/.pnpm/node_modules" pnpm --filter @museumos/api exec tsx --tsconfig tsconfig.json src/main.ts > /tmp/api.log 2>&1 &
+          API_PID=$!
+          pnpm --filter @museumos/web exec vite --port 5173 --strictPort > /tmp/web.log 2>&1 &
+          WEB_PID=$!
+          trap 'kill $API_PID $WEB_PID 2>/dev/null' EXIT
+
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3000/api/health && curl -sf http://localhost:5173; then
+              break
+            fi
+            sleep 2
+          done
+
+          curl -sf http://localhost:3000/api/health
+          pnpm test:api
+          pnpm test:recovery:db
+          pnpm test:e2e --workers=1 --reporter=line

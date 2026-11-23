@@ -110,7 +110,7 @@ export function FinancialsPage() {
       qc.invalidateQueries({ queryKey: ['budget'] });
       toast.success(t('toast.created'));
     },
-    onError: (err: any) => toast.error(err?.message ?? t('toast.error')),
+    onError: (err: unknown) => toast.error(err instanceof Error ? err.message : t('toast.error')),
   });
 
   if (isLoading) {
@@ -198,7 +198,7 @@ function Header({
       qc.invalidateQueries({ queryKey: ['budget-snapshots'] });
       toast.success(t('financials.snapshotSaved'));
     },
-    onError: (err: any) => toast.error(err?.message ?? t('toast.error')),
+    onError: (err: unknown) => toast.error(err instanceof Error ? err.message : t('toast.error')),
   });
 
   // The snapshot dropdown — quick-snap, save-with-name and browse — used
@@ -363,7 +363,7 @@ function Column({ kind, items, canWrite }: { kind: Kind; items: BudgetItem[]; ca
       setAdding(false);
       toast.success(t('toast.created'));
     },
-    onError: (err: any) => toast.error(err?.message ?? t('toast.error')),
+    onError: (err: unknown) => toast.error(err instanceof Error ? err.message : t('toast.error')),
   });
 
   const reorderMutation = useMutation({
@@ -597,7 +597,7 @@ function BudgetRow({
       // Background sync — server is the source of truth.
       qc.invalidateQueries({ queryKey: ['budget'] });
     },
-    onError: (err: any) => toast.error(err?.message ?? t('toast.error')),
+    onError: (err: unknown) => toast.error(err instanceof Error ? err.message : t('toast.error')),
   });
 
   const removeMutation = useMutation({
@@ -606,7 +606,7 @@ function BudgetRow({
       qc.invalidateQueries({ queryKey: ['budget'] });
       toast.success(t('toast.deleted'));
     },
-    onError: (err: any) => toast.error(err?.message ?? t('toast.error')),
+    onError: (err: unknown) => toast.error(err instanceof Error ? err.message : t('toast.error')),
   });
 
   // Fixed default range — was `2 × forecast` which compounded each time
@@ -1541,7 +1541,7 @@ function SaveSnapshotModal({ onClose, onSaved }: { onClose: () => void; onSaved:
       toast.success(t('financials.snapshotSaved'));
       onSaved();
     },
-    onError: (err: any) => toast.error(err?.message ?? t('toast.error')),
+    onError: (err: unknown) => toast.error(err instanceof Error ? err.message : t('toast.error')),
   });
 
   useEffect(() => {
@@ -1623,7 +1623,7 @@ function SnapshotsPanel({ onClose }: { onClose: () => void }) {
       toast.success(t('financials.snapshotRestored'));
       onClose();
     },
-    onError: (err: any) => toast.error(err?.message ?? t('toast.error')),
+    onError: (err: unknown) => toast.error(err instanceof Error ? err.message : t('toast.error')),
   });
 
   const remove = useMutation({
@@ -1632,7 +1632,7 @@ function SnapshotsPanel({ onClose }: { onClose: () => void }) {
       qc.invalidateQueries({ queryKey: ['budget-snapshots'] });
       toast.success(t('toast.deleted'));
     },
-    onError: (err: any) => toast.error(err?.message ?? t('toast.error')),
+    onError: (err: unknown) => toast.error(err instanceof Error ? err.message : t('toast.error')),
   });
 
   useEffect(() => {

@@ -1,0 +1,64 @@
+{
+  "status": "ERROR",
+  "conditions": [
+    {
+      "status": "ERROR",
+      "metricKey": "new_reliability_rating",
+      "comparator": "GT",
+      "periodIndex": 1,
+      "errorThreshold": "1",
+      "actualValue": "3"
+    },
+    {
+      "status": "OK",
+      "metricKey": "new_security_rating",
+      "comparator": "GT",
+      "periodIndex": 1,
+      "errorThreshold": "1",
+      "actualValue": "1"
+    },
+    {
+      "status": "OK",
+      "metricKey": "new_maintainability_rating",
+      "comparator": "GT",
+      "periodIndex": 1,
+      "errorThreshold": "1",
+      "actualValue": "1"
+    },
+    {
+      "status": "OK",
+      "metricKey": "new_coverage",
+      "comparator": "LT",
+      "periodIndex": 1,
+      "errorThreshold": "80"
+    },
+    {
+      "status": "OK",
+      "metricKey": "new_duplicated_lines_density",
+      "comparator": "GT",
+      "periodIndex": 1,
+      "errorThreshold": "3"
+    },
+    {
+      "status": "OK",
+      "metricKey": "new_security_hotspots_reviewed",
+      "comparator": "LT",
+      "periodIndex": 1,
+      "errorThreshold": "100",
+      "actualValue": "100.0"
+    }
+  ],
+  "periods": [
+    {
+      "index": 1,
+      "mode": "PREVIOUS_VERSION",
+      "date": "2026-11-22T17:21:57+05:00"
+    }
+  ],
+  "ignoredConditions": false,
+  "period": {
+    "mode": "PREVIOUS_VERSION",
+    "date": "2026-11-22T17:21:57+05:00"
+  },
+  "caycStatus": "compliant"
+}

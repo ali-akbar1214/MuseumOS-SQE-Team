@@ -65,7 +65,7 @@ export function UsersPage() {
       setNewFields({ email: '', displayName: '', password: '', role: 'curator' });
       toast.success(t('toast.created'));
     },
-    onError: (err: any) => toast.error(err?.message ?? t('toast.error')),
+    onError: (err: unknown) => toast.error(err instanceof Error ? err.message : t('toast.error')),
   });
 
   const updateMutation = useMutation({
@@ -213,9 +213,9 @@ export function UsersPage() {
               {t('common.cancel')}
             </button>
           </div>
-          {createMutation.error && (
+          {createMutation.isError && (
             <p className="mt-2 text-xs text-destructive">
-              {(createMutation.error as any)?.message ?? 'Failed to create user'}
+              {createMutation.error instanceof Error ? createMutation.error.message : 'Failed to create user'}
             </p>
           )}
         </div>

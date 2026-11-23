@@ -1,0 +1,33 @@
+{
+  "source": "apps/api/src/exhibits/exhibit-workflow.ts",
+  "method": "source-level domain mutation; each mutant compiled with TypeScript and checked against a named boundary oracle",
+  "customOperators": [
+    "inclusive numeric boundary to exclusive",
+    "boolean conjunction to disjunction"
+  ],
+  "total": 4,
+  "killed": 4,
+  "score": "100.00%",
+  "outcomes": [
+    {
+      "id": "PRICE-INCLUSIVE-ZERO",
+      "test": "price-zero",
+      "outcome": "KILLED"
+    },
+    {
+      "id": "YEAR-INCLUSIVE-LOWER",
+      "test": "year-minimum",
+      "outcome": "KILLED"
+    },
+    {
+      "id": "YEAR-INCLUSIVE-UPPER",
+      "test": "year-maximum",
+      "outcome": "KILLED"
+    },
+    {
+      "id": "PUBLISH-AND-OR",
+      "test": "publish-needs-validation",
+      "outcome": "KILLED"
+    }
+  ]
+}

@@ -47,7 +47,7 @@ export function AddPage() {
   });
 
   // Clean up object URLs when the component unmounts.
-  useEffect(() => () => { photos.forEach((p) => URL.revokeObjectURL(p.preview)); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => () => { photos.forEach((p) => URL.revokeObjectURL(p.preview)); }, []);
 
   async function handleFiles(fileList: FileList | null) {
     if (!fileList || fileList.length === 0) return;

@@ -145,7 +145,7 @@ export function MentionText({
 // index and the partial query, or null when the caret isn't inside a mention.
 function activeMention(text: string, caret: number): { start: number; query: string } | null {
   const before = text.slice(0, caret);
-  const m = before.match(/(?:^|[^\w@])?@([A-Za-z0-9]*)$/);
+  const m = before.match(/(?:^|[^\w@])@([A-Za-z0-9]*)$/);
   if (!m) return null;
   const atIndex = caret - m[1]!.length - 1;
   const prev = atIndex > 0 ? text[atIndex - 1] : '';

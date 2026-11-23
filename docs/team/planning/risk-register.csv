@@ -1,0 +1,11 @@
+ID,Type,Description,Likelihood,Impact,Level,Technique,EvidenceStatus,Residual,RiskLinkedDefect
+P1,Product,Unvalidated exhibit can be published,5,5,25,Unit and local workflow/API transition checks,Prior local evidence; current API suite rerun pending,Reduced,DEF-001
+P2,Product,Unauthorized role changes exhibit state,4,5,20,Role access matrix,Partial: viewer create and curator validate denial; full matrix absent,Open,DEF-003
+P3,Product,Invalid year or price is persisted,4,4,16,Production Zod contract and generated API EP/BVA,Contract unit pass; revised live API run pending,Reduced,Not linked
+P4,Product,Repeated write creates duplicate exhibit,3,5,15,Repeated-request API check,Prior local API evidence; revised suite rerun pending,Reduced,Not linked
+P5,Product,Published exhibit returns to draft,3,5,15,State transition tests,Unit evidence present; API/browser case added but not rerun,Open,DEF-001
+P6,Product,Database data is lost or inconsistent,3,5,15,Mocked failed-write retry; real database row-count recovery needed,Mock only; real DB evidence absent,Open,DEF-002
+P7,Product,Slow exhibit reads under concurrent users,3,4,12,k6 one and five user runs,Four prior local runs; smoke-scale only,Reduced,Not linked
+P8,Product,Workflow screen is inaccessible,3,4,12,axe three captures; Lighthouse accessibility one exhibits screen,Existing evidence; limited screen/category scope,Reduced,Not linked
+Q1,Project,Team evidence not reproducible,4,5,20,Versioned scripts; CI/PR evidence,External CI and blocked/fix PR absent,Open,Not linked
+Q2,Project,One member cannot explain owned area,3,5,15,Member-owned commits/time logs/viva rehearsal,Pending team-authored evidence,Open,Not linked

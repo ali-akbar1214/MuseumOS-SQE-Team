@@ -91,7 +91,7 @@ export function LocationsPage() {
   const sorted = useMemo(() => {
     const list = [...(locations ?? [])];
     return list.sort((a, b) => {
-      let cmp = 0;
+      let cmp: number;
       if (sortBy === 'code') cmp = a.code.localeCompare(b.code);
       else if (sortBy === 'nameEn') cmp = (a.nameEn ?? '').localeCompare(b.nameEn ?? '');
       else if (sortBy === 'nameEl') cmp = (a.nameEl ?? '').localeCompare(b.nameEl ?? '');

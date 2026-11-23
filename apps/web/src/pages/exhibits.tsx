@@ -574,7 +574,7 @@ export function ExhibitsPage() {
       setAddedAttrKeys([]);
       return;
     }
-    let stored: string[] = [];
+    let stored: string[];
     try {
       stored = JSON.parse(localStorage.getItem(ATTR_KEYS_PREFIX + categoryId) ?? '[]');
     } catch {
@@ -583,7 +583,6 @@ export function ExhibitsPage() {
     const merged = Array.from(new Set([...stored, ...Object.keys(attrs)]));
     // Keep only keys that still exist as fields on this category.
     setAddedAttrKeys(merged.filter((k) => k in (selectedCategory?.schema?.properties ?? {}) && k !== 'type'));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categoryId, selectedCategory]);
 
   function persistAttrKeys(keys: string[]) {
@@ -1886,8 +1885,8 @@ function NewExhibitModal({
     onSuccess: (created) => {
       onCreated(created.id);
     },
-    onError: (err: any) => {
-      setError(err?.message ?? t('toast.createExhibitFailed'));
+    onError: (err: unknown) => {
+      setError(err instanceof Error ? err.message : t('toast.createExhibitFailed'));
     },
   });
 
@@ -1924,14 +1923,17 @@ function NewExhibitModal({
   return (
     <div
       className="fixed inset-0 z-40 flex items-center justify-center bg-black/60 p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="new-exhibit-title"
     >
       <form
         onSubmit={handleSubmit}
         className="flex max-h-[90vh] w-full max-w-2xl flex-col rounded-lg bg-card shadow-xl"
       >
         <div className="flex shrink-0 items-center justify-between border-b border-border px-7 py-4">
-          <h2 className="font-display text-xl font-semibold">{t('exhibits.newExhibit')}</h2>
-          <button type="button" onClick={onClose} className="rounded p-1.5 text-muted-foreground hover:bg-muted">
+          <h2 id="new-exhibit-title" className="font-display text-xl font-semibold">{t('exhibits.newExhibit')}</h2>
+          <button type="button" aria-label={t('common.close') as string} onClick={onClose} className="rounded p-1.5 text-muted-foreground hover:bg-muted">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -1962,10 +1964,11 @@ function NewExhibitModal({
 
           <div className="grid grid-cols-2 gap-4">
             <div className={categorySchema?.properties?.type ? '' : 'col-span-2'}>
-              <label className={labelCls}>
+              <label htmlFor="new-exhibit-category" className={labelCls}>
                 {t('exhibit.category')} *
               </label>
               <select
+                id="new-exhibit-category"
                 value={categoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
                 className={inputCls}
@@ -1996,11 +1999,12 @@ function NewExhibitModal({
               if (current && !knownTypes.includes(current)) knownTypes.unshift(current);
               return (
                 <div>
-                  <label className={labelCls}>
+                  <label htmlFor="new-exhibit-type" className={labelCls}>
                     {fieldLabel(categorySchema.properties.type, lang, 'Type')}
                   </label>
                   {addingType ? (
                     <input
+                      id="new-exhibit-type"
                       autoFocus
                       placeholder={t('exhibits.newTypePlaceholder') as string}
                       value={current}
@@ -2017,6 +2021,7 @@ function NewExhibitModal({
                     // combobox affordance. Same pattern as category dropdown
                     // in Financials.
                     <select
+                      id="new-exhibit-type"
                       value={current}
                       onChange={(e) => {
                         if (e.target.value === '__add__') {
@@ -2038,10 +2043,11 @@ function NewExhibitModal({
             })()}
 
             <div className="col-span-2">
-              <label className={labelCls}>
+              <label htmlFor="new-exhibit-name" className={labelCls}>
                 {t('exhibits.exhibitName')} *
               </label>
               <input
+                id="new-exhibit-name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className={inputCls}
@@ -2050,8 +2056,9 @@ function NewExhibitModal({
             </div>
 
             <div>
-              <label className={labelCls}>{t('exhibit.manufacturer')}</label>
+              <label htmlFor="new-exhibit-manufacturer" className={labelCls}>{t('exhibit.manufacturer')}</label>
               <input
+                id="new-exhibit-manufacturer"
                 list="manufacturers-list-add"
                 value={manufacturer}
                 onChange={(e) => setManufacturer(e.target.value)}
@@ -2065,8 +2072,9 @@ function NewExhibitModal({
               )}
             </div>
             <div>
-              <label className={labelCls}>{t('exhibit.year')}</label>
+              <label htmlFor="new-exhibit-year" className={labelCls}>{t('exhibit.year')}</label>
               <input
+                id="new-exhibit-year"
                 type="number"
                 value={year}
                 onChange={(e) => setYear(e.target.value)}
@@ -2084,8 +2092,9 @@ function NewExhibitModal({
               />
             </div>
             <div>
-              <label className={labelCls}>{t('exhibit.location')}</label>
+              <label htmlFor="new-exhibit-location" className={labelCls}>{t('exhibit.location')}</label>
               <select
+                id="new-exhibit-location"
                 value={locationId}
                 onChange={(e) => setLocationId(e.target.value)}
                 className={inputCls}
@@ -2100,8 +2109,9 @@ function NewExhibitModal({
             </div>
 
             <div>
-              <label className={labelCls}>{t('exhibit.site')}</label>
+              <label htmlFor="new-exhibit-site" className={labelCls}>{t('exhibit.site')}</label>
               <input
+                id="new-exhibit-site"
                 value={locSite}
                 onChange={(e) => setLocSite(e.target.value)}
                 className={inputCls}
@@ -2109,8 +2119,9 @@ function NewExhibitModal({
               />
             </div>
             <div>
-              <label className={labelCls}>{t('exhibit.acquiredAt')}</label>
+              <label htmlFor="new-exhibit-acquired-at" className={labelCls}>{t('exhibit.acquiredAt')}</label>
               <input
+                id="new-exhibit-acquired-at"
                 type="date"
                 value={acquiredAt}
                 onChange={(e) => setAcquiredAt(e.target.value)}
@@ -2128,9 +2139,10 @@ function NewExhibitModal({
                   const value = attributes[key] ?? '';
                   return (
                     <div key={key}>
-                      <label className={labelCls}>{label}</label>
+                      <label htmlFor={`new-exhibit-attribute-${key}`} className={labelCls}>{label}</label>
                       {prop.enum ? (
                         <select
+                          id={`new-exhibit-attribute-${key}`}
                           value={value}
                           onChange={(e) => setAttributes((a) => ({ ...a, [key]: e.target.value }))}
                           className={inputCls}
@@ -2141,6 +2153,7 @@ function NewExhibitModal({
                       ) : (prop.autocomplete || prop.suggestions) ? (
                         <>
                           <input
+                            id={`new-exhibit-attribute-${key}`}
                             list={`attr-${key}-list-add`}
                             value={value}
                             onChange={(e) => setAttributes((a) => ({ ...a, [key]: e.target.value }))}
@@ -2152,6 +2165,7 @@ function NewExhibitModal({
                         </>
                       ) : (
                         <input
+                          id={`new-exhibit-attribute-${key}`}
                           value={value}
                           onChange={(e) => setAttributes((a) => ({ ...a, [key]: e.target.value }))}
                           className={inputCls}

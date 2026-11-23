@@ -149,7 +149,7 @@ export function TimelinePage() {
     const el = scrollRef.current; if (!el || laneWidth < 10) return;
     el.scrollLeft = (pct(1974) / 100) * laneWidth;
     autoScrolled.current = true;
-  }, [view, companies.length, laneWidth]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [view, companies.length, laneWidth]);
 
   const selected = companies.find((c) => c.id === selectedId) ?? null;
   function openCompany(id: string) { setSelectedId(id); setView('company'); setDetailZoom(1); setHover(null); }

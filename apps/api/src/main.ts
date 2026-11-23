@@ -4,7 +4,7 @@ import { randomBytes } from 'crypto';
 import express from 'express';
 import { NestFactory } from '@nestjs/core';
 import { Logger } from '@nestjs/common';
-import { NestExpressApplication } from '@nestjs/platform-express';
+import type { NestExpressApplication } from '@nestjs/platform-express';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';

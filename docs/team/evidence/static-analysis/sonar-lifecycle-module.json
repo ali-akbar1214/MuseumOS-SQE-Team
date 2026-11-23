@@ -1,0 +1,24 @@
+{
+  "component": {
+    "key": "MuseumOS-SQE-final:apps/api/src/exhibits/exhibit-workflow.ts",
+    "name": "exhibit-workflow.ts",
+    "qualifier": "FIL",
+    "path": "apps/api/src/exhibits/exhibit-workflow.ts",
+    "language": "ts",
+    "measures": [
+      {
+        "metric": "cognitive_complexity",
+        "value": "16",
+        "bestValue": false
+      },
+      {
+        "metric": "complexity",
+        "value": "22"
+      },
+      {
+        "metric": "ncloc",
+        "value": "55"
+      }
+    ]
+  }
+}

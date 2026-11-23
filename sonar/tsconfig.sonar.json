@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "jsx": "react-jsx",
+    "allowJs": false,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "baseUrl": "..",
+    "paths": {
+      "@/*": ["apps/web/src/*"]
+    }
+  },
+  "include": [
+    "../apps/**/*.ts",
+    "../apps/**/*.tsx",
+    "../packages/**/*.ts",
+    "../packages/**/*.tsx"
+  ],
+  "exclude": ["../**/node_modules", "../**/dist", "../**/coverage"]
+}

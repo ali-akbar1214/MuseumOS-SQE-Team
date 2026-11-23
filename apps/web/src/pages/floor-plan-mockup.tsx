@@ -59,7 +59,7 @@ const PINS: MockPin[] = [
   { id: 'pin10', exhibitId: 'e6', x: 0.78, y: 0.66, rotation: 0 },
 ];
 
-const CATEGORY_VISUAL: Record<string, { icon: any; color: string; bg: string }> = {
+const CATEGORY_VISUAL: Record<string, { icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>; color: string; bg: string }> = {
   computers:  { icon: Monitor,   color: '#2563eb', bg: '#dbeafe' },
   books:      { icon: Book,      color: '#d97706', bg: '#fef3c7' },
   software:   { icon: Disc,      color: '#7c3aed', bg: '#ede9fe' },

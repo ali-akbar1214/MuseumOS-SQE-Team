@@ -1,0 +1,107 @@
+{
+  "paging": {
+    "pageIndex": 1,
+    "pageSize": 100,
+    "total": 3
+  },
+  "hotspots": [
+    {
+      "key": "AaIDOHLJnka1jymTRYyS",
+      "component": "MuseumOS-SQE-final:apps/web/src/lib/branding.ts",
+      "project": "MuseumOS-SQE-final",
+      "securityCategory": "dos",
+      "vulnerabilityProbability": "MEDIUM",
+      "status": "REVIEWED",
+      "resolution": "SAFE",
+      "line": 20,
+      "message": "Make sure the regex used here, which is vulnerable to super-linear runtime due to backtracking, cannot lead to denial of service.",
+      "author": "",
+      "creationDate": "2026-11-22T17:24:54+05:00",
+      "updateDate": "2026-11-22T17:28:34+05:00",
+      "textRange": {
+        "startLine": 20,
+        "endLine": 20,
+        "startOffset": 77,
+        "endOffset": 83
+      },
+      "flows": [],
+      "ruleKey": "typescript:S5852",
+      "messageFormattings": []
+    },
+    {
+      "key": "AaIDOHGtnka1jymTRYwk",
+      "component": "MuseumOS-SQE-final:apps/web/src/pages/dashboard.tsx",
+      "project": "MuseumOS-SQE-final",
+      "securityCategory": "weak-cryptography",
+      "vulnerabilityProbability": "MEDIUM",
+      "status": "REVIEWED",
+      "resolution": "SAFE",
+      "line": 39,
+      "message": "Make sure that using this pseudorandom number generator is safe here.",
+      "author": "",
+      "creationDate": "2026-11-22T17:24:54+05:00",
+      "updateDate": "2026-11-22T17:28:34+05:00",
+      "textRange": {
+        "startLine": 39,
+        "endLine": 39,
+        "startOffset": 36,
+        "endOffset": 49
+      },
+      "flows": [],
+      "ruleKey": "typescript:S2245",
+      "messageFormattings": []
+    },
+    {
+      "key": "AaIDOHIenka1jymTRYxb",
+      "component": "MuseumOS-SQE-final:apps/web/src/pages/not-found.tsx",
+      "project": "MuseumOS-SQE-final",
+      "securityCategory": "weak-cryptography",
+      "vulnerabilityProbability": "MEDIUM",
+      "status": "REVIEWED",
+      "resolution": "SAFE",
+      "line": 13,
+      "message": "Make sure that using this pseudorandom number generator is safe here.",
+      "author": "",
+      "creationDate": "2026-11-22T17:24:54+05:00",
+      "updateDate": "2026-11-22T17:28:35+05:00",
+      "textRange": {
+        "startLine": 13,
+        "endLine": 13,
+        "startOffset": 68,
+        "endOffset": 81
+      },
+      "flows": [],
+      "ruleKey": "typescript:S2245",
+      "messageFormattings": []
+    }
+  ],
+  "components": [
+    {
+      "key": "MuseumOS-SQE-final:apps/web/src/pages/not-found.tsx",
+      "qualifier": "FIL",
+      "name": "not-found.tsx",
+      "longName": "apps/web/src/pages/not-found.tsx",
+      "path": "apps/web/src/pages/not-found.tsx"
+    },
+    {
+      "key": "MuseumOS-SQE-final:apps/web/src/lib/branding.ts",
+      "qualifier": "FIL",
+      "name": "branding.ts",
+      "longName": "apps/web/src/lib/branding.ts",
+      "path": "apps/web/src/lib/branding.ts"
+    },
+    {
+      "key": "MuseumOS-SQE-final",
+      "qualifier": "TRK",
+      "name": "MuseumOS-SQE-final",
+      "longName": "MuseumOS-SQE-final"
+    },
+    {
+      "key": "MuseumOS-SQE-final:apps/web/src/pages/dashboard.tsx",
+      "qualifier": "FIL",
+      "name": "dashboard.tsx",
+      "longName": "apps/web/src/pages/dashboard.tsx",
+      "path": "apps/web/src/pages/dashboard.tsx"
+    }
+  ]
+}

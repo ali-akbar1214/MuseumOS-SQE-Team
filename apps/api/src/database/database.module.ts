@@ -1,4 +1,5 @@
-import { Global, Inject, Module, OnModuleDestroy } from '@nestjs/common';
+import type { OnModuleDestroy } from '@nestjs/common';
+import { Global, Inject, Module } from '@nestjs/common';
 import { DatabaseService } from './database.service';
 
 @Global()

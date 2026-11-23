@@ -61,8 +61,8 @@ export function DonorFileManager({
         throw new Error(body.message ?? `Upload failed (${res.status})`);
       }
       await onRefresh();
-    } catch (err: any) {
-      setError(err.message ?? t('toast.uploadFailed'));
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : t('toast.uploadFailed'));
     } finally {
       setBusy(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -74,7 +74,7 @@ export function DonorFileManager({
     try {
       await api.post(`/donors/${donorId}/files/${fileId}/rotate`, { direction });
       await onRefresh();
-    } catch (err: any) { setError(err.message ?? t('toast.error')); }
+    } catch (err: unknown) { setError(err instanceof Error ? err.message : t('toast.error')); }
     finally { setBusy(false); }
   }
 
@@ -84,7 +84,7 @@ export function DonorFileManager({
       await api.delete(`/donors/${donorId}/files/${fileId}`);
       setConfirmDelete(null);
       await onRefresh();
-    } catch (err: any) { setError(err.message ?? t('toast.deleteFailed')); }
+    } catch (err: unknown) { setError(err instanceof Error ? err.message : t('toast.deleteFailed')); }
     finally { setBusy(false); }
   }
 
@@ -95,9 +95,8 @@ export function DonorFileManager({
           onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
           onDragLeave={() => setDragOver(false)}
           onDrop={(e) => { e.preventDefault(); setDragOver(false); handleFiles(e.dataTransfer.files); }}
-          className={`flex flex-col items-center gap-2 rounded-lg border-2 border-dashed p-6 text-center transition-colors ${
-            dragOver ? 'border-primary bg-primary/5' : 'border-input'
-          }`}
+          className={`flex flex-col items-center gap-2 rounded-lg border-2 border-dashed p-6 text-center transition-colors ${dragOver ? 'border-primary bg-primary/5' : 'border-input'
+            }`}
         >
           <Upload className="h-6 w-6 text-muted-foreground" />
           <div className="text-sm">
@@ -212,7 +211,7 @@ export function DonorFileManager({
                 )}
               </div>
 
-              {(file.originalFilename || file.bytes) && (
+              {Boolean(file.originalFilename || file.bytes) && (
                 <div className="truncate border-t border-border bg-card px-2 py-1 text-[11px] text-muted-foreground" title={file.originalFilename ?? ''}>
                   {file.originalFilename ?? t('donors.file')}
                   {file.bytes ? ` · ${humanSize(file.bytes)}` : ''}

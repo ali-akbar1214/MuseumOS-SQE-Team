@@ -16,8 +16,8 @@ export function LoginPage() {
     setLoading(true);
     try {
       await login(identifier, password);
-    } catch (err: any) {
-      setError(err.message || t('common.loginFailed'));
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : t('common.loginFailed'));
     } finally {
       setLoading(false);
     }

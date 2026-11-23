@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import { DatabaseService } from '../database';
 import type { SearchQuery, GlobalSearchInput } from '@museumos/contracts';
 import { thumbUrl } from './thumbnails';
@@ -52,7 +52,7 @@ export class ExhibitsSearchService {
         where,
         attrSpecs,
       );
-      const ids = ftsResult.items.map((it: any) => it.id);
+      const ids = ftsResult.items.map((it: { id: string }) => it.id);
       if (ids.length === 0) return [];
       where.id = { in: ids };
     } else if (attrSpecs.length > 0) {
@@ -304,7 +304,7 @@ export class ExhibitsSearchService {
 
     const limitIdx = idx++;
     searchParams.push(query.limit);
-    const offsetIdx = idx++;
+    const offsetIdx = idx;
     searchParams.push(offset);
 
     const filterSql = searchFilters.join(' AND ');
@@ -316,7 +316,32 @@ export class ExhibitsSearchService {
     );
     const total = Number(countRows[0]?.count ?? 0);
 
-    const rows = await this.db.$queryRawUnsafe<any[]>(
+    interface FtsRow {
+      id: string;
+      categoryId: string;
+      displayId: string;
+      exhibitName: string;
+      manufacturer: string | null;
+      year: number | null;
+      validated: boolean;
+      published: boolean;
+      functional: boolean | null;
+      locationId: string | null;
+      createdAt: Date;
+      updatedAt: Date;
+      type: string | null;
+      capacity: string | null;
+      categoryCode: string;
+      categoryNameEn: string;
+      categoryNameEl: string;
+      locationCode: string | null;
+      rank: string;
+      primaryStorageKey: string | null;
+      primaryRevision: number | null;
+      imageCount: number | null;
+    }
+
+    const rows = await this.db.$queryRawUnsafe<FtsRow[]>(
       `SELECT
         e.id,
         e.category_id as "categoryId",
@@ -377,7 +402,7 @@ export class ExhibitsSearchService {
         tags: [],
         imageCount: r.imageCount ?? 0,
         primaryImageUrl: r.primaryStorageKey
-          ? `/img/${r.primaryStorageKey}${r.primaryRevision > 0 ? `?r=${r.primaryRevision}` : ''}`
+          ? `/img/${r.primaryStorageKey}${(r.primaryRevision ?? 0) > 0 ? `?r=${r.primaryRevision}` : ''}`
           : null,
         primaryThumbnailUrl: r.primaryStorageKey ? thumbUrl(r.primaryStorageKey, 320, r.primaryRevision ?? 0) : null,
         primaryGridUrl: r.primaryStorageKey ? thumbUrl(r.primaryStorageKey, 640, r.primaryRevision ?? 0) : null,
@@ -395,7 +420,20 @@ export class ExhibitsSearchService {
 
     const tsQuery = sanitized.split(/\s+/).map(displayIdAwareToken).join(' & ');
 
-    const rows = await this.db.$queryRawUnsafe<any[]>(
+    interface GlobalSearchRow {
+      id: string;
+      displayId: string;
+      exhibitName: string;
+      manufacturer: string | null;
+      categoryCode: string;
+      categoryNameEn: string;
+      categoryNameEl: string;
+      primaryStorageKey: string | null;
+      primaryRevision: number | null;
+      rank: string;
+    }
+
+    const rows = await this.db.$queryRawUnsafe<GlobalSearchRow[]>(
       `SELECT
         e.id,
         e.display_id as "displayId",

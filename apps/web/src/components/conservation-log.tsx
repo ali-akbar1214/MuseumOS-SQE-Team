@@ -90,7 +90,7 @@ export function ConservationLog({ exhibitId }: Props) {
   return (
     <div className="border-t border-border p-5">
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="font-display text-base font-semibold">{t('notes.title')}</h3>
+        <h2 className="font-display text-base font-semibold">{t('notes.title')}</h2>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setOrder((o) => (o === 'desc' ? 'asc' : 'desc'))}

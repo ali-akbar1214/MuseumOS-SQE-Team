@@ -145,8 +145,8 @@ export function DonorsPage() {
             const body = await res.json().catch(() => ({}));
             throw new Error(body.message ?? `Upload failed (${res.status})`);
           }
-        } catch (e: any) {
-          uploadError = e?.message ?? t('toast.uploadFailed');
+        } catch (e: unknown) {
+          uploadError = e instanceof Error ? e.message : t('toast.uploadFailed');
         }
       }
       return { created, uploadError };
@@ -162,7 +162,7 @@ export function DonorsPage() {
     },
     // Surface the API message (e.g. a duplicate-name collision) so the user
     // knows why the create was rejected.
-    onError: (err: any) => toast.error(err?.message ?? t('toast.error')),
+    onError: (err: unknown) => toast.error(err instanceof Error ? err.message : t('toast.error')),
   });
 
   function toggleSort(key: SortKey) {

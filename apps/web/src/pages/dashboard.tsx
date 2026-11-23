@@ -38,7 +38,7 @@ function pickQuote(): Quote {
 
   const pickedIdx = pool[Math.floor(Math.random() * pool.length)]!;
   const updated = [pickedIdx, ...recent].slice(0, RECENT_WINDOW);
-  try { sessionStorage.setItem(RECENT_KEY, JSON.stringify(updated)); } catch {}
+  try { sessionStorage.setItem(RECENT_KEY, JSON.stringify(updated)); } catch { /* ignore storage errors */ }
   return QUOTES[pickedIdx]!;
 }
 
@@ -80,7 +80,7 @@ function StatCard({
 }: {
   label: string;
   value: string | number;
-  icon: any;
+  icon: React.ComponentType<{ className?: string }>;
   to?: string;
   tone?: 'default' | 'warning' | 'success';
 }) {
@@ -186,12 +186,12 @@ export function DashboardPage() {
 
   const { data: donors } = useQuery({
     queryKey: ['donors'],
-    queryFn: () => api.get<any[]>('/donors'),
+    queryFn: () => api.get<unknown[]>('/donors'),
   });
 
   const { data: locations } = useQuery({
     queryKey: ['locations'],
-    queryFn: () => api.get<any[]>('/locations'),
+    queryFn: () => api.get<unknown[]>('/locations'),
   });
 
   const { data: audit } = useQuery({

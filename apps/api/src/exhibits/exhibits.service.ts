@@ -4,7 +4,7 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import { DatabaseService } from '../database';
 import { CategoriesService } from '../categories';
 import type { CreateExhibitInput, UpdateExhibitInput } from '@museumos/contracts';
@@ -61,12 +61,25 @@ export class ExhibitsService {
     @Inject(CategoriesService) private readonly categoriesService: CategoriesService,
   ) {}
 
-  private formatExhibit(raw: any) {
+  private formatExhibit<
+    T extends {
+      tags?: Array<{ tag: { id: string; name: string; color: string | null } }>;
+      _count?: { images?: number };
+      images?: Array<{
+        id: string;
+        storageKey: string;
+        originalFilename: string | null;
+        mimeType: string | null;
+        isPrimary: boolean;
+        revision: number;
+      }>;
+    },
+  >(raw: T) {
     const { tags, _count, images, ...rest } = raw;
     return {
       ...rest,
-      tags: tags?.map((et: any) => et.tag) ?? [],
-      images: (images ?? []).map((img: any) => ({
+      tags: tags?.map((et) => et.tag) ?? [],
+      images: (images ?? []).map((img) => ({
         id: img.id,
         filename: img.originalFilename ?? img.storageKey,
         mimeType: img.mimeType,
@@ -445,7 +458,7 @@ export class ExhibitsService {
 
       await tx.exhibit.updateMany({
         where: { id: { in: ids }, deletedAt: null },
-        data: data as any,
+        data: data as Prisma.ExhibitUpdateManyMutationInput,
       });
 
       if (tags) {

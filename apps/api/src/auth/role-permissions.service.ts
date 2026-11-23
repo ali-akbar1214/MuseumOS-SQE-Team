@@ -1,8 +1,9 @@
+import type {
+  OnModuleInit} from '@nestjs/common';
 import {
   Inject,
   Injectable,
   Logger,
-  OnModuleInit,
   BadRequestException,
 } from '@nestjs/common';
 import type { Role } from '@prisma/client';

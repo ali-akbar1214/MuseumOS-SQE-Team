@@ -1,5 +1,5 @@
 import { Controller, Get, Inject, Query } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import { DatabaseService } from '../database';
 import { RequirePermission } from '../auth/decorators/require-permission.decorator';
 

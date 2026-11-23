@@ -76,6 +76,7 @@ export function DonorPicker({
     <div ref={wrapperRef} className="relative">
       <button
         type="button"
+        aria-label={t('exhibit.donor') as string}
         onClick={() => {
           setOpen((o) => !o);
           setTimeout(() => inputRef.current?.focus(), 0);

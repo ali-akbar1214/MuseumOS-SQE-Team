@@ -122,7 +122,6 @@ export function MarketingPage() {
     if (connected || error) {
       window.history.replaceState({}, '', window.location.pathname);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -253,7 +252,6 @@ function ComposerWireframe() {
     if (selectedAccountIds.size === 0 && accounts.length > 0) {
       setSelectedAccountIds(new Set(accounts.map((a) => a.id)));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accounts.length]);
 
   // ─── Captions, hashtags, scheduling ───────────────────────
@@ -272,7 +270,6 @@ function ComposerWireframe() {
       setCaptionEl(`Σήμερα στο ${branding.shortName}: ${selected.exhibitName}${selected.year ? ` (${selected.year})` : ''}. ${selected.manufacturer ?? ''}`.trim());
       setCaptionEn(`Today at ${branding.shortName}: ${selected.exhibitName}${selected.year ? ` (${selected.year})` : ''}${selected.manufacturer ? `, made by ${selected.manufacturer}` : ''}.`);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected?.id]);
 
   // Hashtag suggestions are computed from the selected exhibit. The
@@ -847,7 +844,7 @@ function InboxWireframe() {
   const active = MOCK_THREADS.find((t) => t.id === activeId) ?? MOCK_THREADS[0]!;
   const unreadCount = MOCK_THREADS.filter((t) => t.unread).length;
 
-  const platforms: Record<Plat, ComponentType<{ className?: string; style?: any }>> = {
+  const platforms: Record<Plat, ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
     facebook: FacebookIcon, instagram: InstagramIcon, youtube: YoutubeIcon, x: XIcon, linkedin: LinkedinIcon,
   };
 

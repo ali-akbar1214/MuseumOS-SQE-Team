@@ -34,9 +34,9 @@ export function TabBar() {
             }`
           }
         >
-          {({ isActive }) => (
+          {() => (
             <>
-              <Icon className={primary ? 'h-7 w-7' : `h-5 w-5 ${isActive ? '' : ''}`} />
+              <Icon className={primary ? 'h-7 w-7' : 'h-5 w-5'} />
               <span>{t(key)}</span>
             </>
           )}

@@ -1,0 +1,60 @@
+{
+  "component": {
+    "key": "MuseumOS-SQE-final",
+    "name": "MuseumOS-SQE-final",
+    "qualifier": "TRK",
+    "measures": [
+      {
+        "metric": "ncloc",
+        "value": "25493"
+      },
+      {
+        "metric": "bugs",
+        "value": "0",
+        "bestValue": true
+      },
+      {
+        "metric": "code_smells",
+        "value": "183",
+        "bestValue": false
+      },
+      {
+        "metric": "alert_status",
+        "value": "OK"
+      },
+      {
+        "metric": "security_hotspots",
+        "value": "0",
+        "bestValue": true
+      },
+      {
+        "metric": "vulnerabilities",
+        "value": "0",
+        "bestValue": true
+      },
+      {
+        "metric": "duplicated_lines_density",
+        "value": "2.2",
+        "bestValue": false
+      },
+      {
+        "metric": "lines",
+        "value": "28563"
+      },
+      {
+        "metric": "coverage",
+        "value": "1.3",
+        "bestValue": false
+      },
+      {
+        "metric": "complexity",
+        "value": "5682"
+      },
+      {
+        "metric": "cognitive_complexity",
+        "value": "3610",
+        "bestValue": false
+      }
+    ]
+  }
+}

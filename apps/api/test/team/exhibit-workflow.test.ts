@@ -28,6 +28,8 @@ describe('exhibit workflow business rules', () => {
     expect(isAcquisitionYearAllowed(1799)).toBe(false);
     expect(isAcquisitionYearAllowed(2101)).toBe(false);
     expect(isAcquisitionYearAllowed(2000.5)).toBe(false);
+    expect(isAcquisitionYearAllowed(1799.5)).toBe(false);
+    expect(isAcquisitionYearAllowed(2100.5)).toBe(false);
   });
 
   it('rejects negative or non-finite collectible prices', () => {
@@ -36,6 +38,7 @@ describe('exhibit workflow business rules', () => {
     expect(isCollectiblePriceAllowed(125.5)).toBe(true);
     expect(isCollectiblePriceAllowed(-0.01)).toBe(false);
     expect(isCollectiblePriceAllowed(Number.POSITIVE_INFINITY)).toBe(false);
+    expect(isCollectiblePriceAllowed(Number.NaN)).toBe(false);
   });
   it('maps draft, validated, and published states', () => {
     expect(getExhibitState(record())).toBe('draft');
@@ -43,14 +46,24 @@ describe('exhibit workflow business rules', () => {
     expect(getExhibitState(record({ validated: true, published: true }))).toBe('published');
   });
 
-  it('requires validation, name, and category before publish', () => {
-    expect(isPublishAllowed({ exhibitName: 'Test', categoryId: record().categoryId, validated: true })).toBe(true);
-    expect(isPublishAllowed({ exhibitName: 'Test', categoryId: record().categoryId, validated: false })).toBe(false);
-    expect(isPublishAllowed({ exhibitName: ' ', categoryId: record().categoryId, validated: true })).toBe(false);
-    expect(isPublishAllowed({ exhibitName: 'Test', categoryId: null, validated: true })).toBe(false);
+  it.each([
+    ['UT-PUBLISH-01', true, true, true, true],
+    ['UT-PUBLISH-02', true, true, false, false],
+    ['UT-PUBLISH-03', true, false, true, false],
+    ['UT-PUBLISH-04', true, false, false, false],
+    ['UT-PUBLISH-05', false, true, true, false],
+    ['UT-PUBLISH-06', false, true, false, false],
+    ['UT-PUBLISH-07', false, false, true, false],
+    ['UT-PUBLISH-08', false, false, false, false],
+  ])('%s applies the publish decision table (validated=%s, named=%s, categorized=%s)', (_caseId, validated, named, categorized, expected) => {
+    expect(isPublishAllowed({
+      exhibitName: named ? 'Test' : '  ',
+      categoryId: categorized ? record().categoryId : null,
+      validated,
+    })).toBe(expected);
   });
 
-  it('allows a draft to become validated and then published', () => {
+  it('UT-TRANSITION-ALLOW-01 allows a draft to validate and a validated record to publish', () => {
     const draft = record();
     expect(validateExhibitTransition({
       exhibitName: draft.exhibitName,
@@ -68,7 +81,7 @@ describe('exhibit workflow business rules', () => {
     }).allowed).toBe(true);
   });
 
-  it('rejects publishing an unvalidated exhibit', () => {
+  it('UT-TRANSITION-REJECT-UNVALIDATED-01 rejects publishing an unvalidated exhibit', () => {
     const result = validateExhibitTransition({
       exhibitName: 'Test',
       categoryId: record().categoryId,
@@ -77,9 +90,35 @@ describe('exhibit workflow business rules', () => {
       nextPublished: true,
     });
     expect(result.allowed).toBe(false);
+    expect(result).toEqual({ allowed: false, reason: 'An exhibit must be validated before it can be published' });
   });
 
-  it('rejects every transition out of published', () => {
+  it('UT-TRANSITION-REJECT-REQUIRED-01 rejects blank names and missing categories', () => {
+    const current = record();
+    const blankName = validateExhibitTransition({
+      exhibitName: '  ', categoryId: current.categoryId, current, nextValidated: true, nextPublished: false,
+    });
+    const noCategory = validateExhibitTransition({
+      exhibitName: current.exhibitName, categoryId: null, current, nextValidated: true, nextPublished: false,
+    });
+    expect(blankName).toEqual({ allowed: false, reason: 'Exhibit name is required' });
+    expect(noCategory).toEqual({ allowed: false, reason: 'A category is required' });
+  });
+
+  it('UT-TRANSITION-ALLOW-NOOP-01 covers draft and published no-op transitions', () => {
+    const draft = record();
+    expect(validateExhibitTransition({
+      exhibitName: draft.exhibitName, categoryId: draft.categoryId, current: draft,
+      nextValidated: false, nextPublished: false,
+    })).toEqual({ allowed: true });
+    const published = record({ validated: true, published: true });
+    expect(validateExhibitTransition({
+      exhibitName: published.exhibitName, categoryId: published.categoryId, current: published,
+      nextValidated: true, nextPublished: true,
+    })).toEqual({ allowed: true });
+  });
+
+  it('UT-TERMINAL-01 rejects every transition out of published', () => {
     const published = record({ validated: true, published: true });
     expect(validateExhibitTransition({
       exhibitName: published.exhibitName,
@@ -88,5 +127,12 @@ describe('exhibit workflow business rules', () => {
       nextValidated: true,
       nextPublished: false,
     }).allowed).toBe(false);
+    expect(validateExhibitTransition({
+      exhibitName: published.exhibitName,
+      categoryId: published.categoryId,
+      current: published,
+      nextValidated: false,
+      nextPublished: false,
+    })).toEqual({ allowed: false, reason: 'A published exhibit cannot return to draft or validated state' });
   });
 });

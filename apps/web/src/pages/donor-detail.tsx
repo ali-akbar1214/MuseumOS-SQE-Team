@@ -361,10 +361,10 @@ function DonorEditForm({
       toast.success(t('toast.saved'));
       onSaved();
     },
-    onError: (err: any) => {
+    onError: (err: unknown) => {
       // Surface name-collision from the API distinctly so the user knows
       // why the save was rejected.
-      toast.error(err?.message ?? t('toast.error'));
+      toast.error(err instanceof Error ? err.message : t('toast.error'));
     },
   });
 

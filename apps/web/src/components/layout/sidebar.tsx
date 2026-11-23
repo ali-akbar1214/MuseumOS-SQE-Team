@@ -41,7 +41,7 @@ if (typeof window !== 'undefined') (window as unknown as { __clickTs?: number[] 
 // sidebar render. "Main" holds the day-to-day catalogue tools, "money"
 // isolates the Financials view, and "meta" parks the system / read-only
 // pages at the bottom so they don't crowd the catalogue.
-type NavItem = { to: string; i18n: string; icon: any; permission?: string; beta?: boolean };
+type NavItem = { to: string; i18n: string; icon: React.ComponentType<{ className?: string }>; permission?: string; beta?: boolean };
 const NAV_MAIN: NavItem[] = [
   { to: '/',           i18n: 'nav.dashboard',  icon: LayoutDashboard },
   { to: '/exhibits',   i18n: 'nav.exhibits',   icon: Archive,        permission: 'exhibit:read' },

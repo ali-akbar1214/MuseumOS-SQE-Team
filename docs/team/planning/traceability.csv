@@ -1,0 +1,9 @@
+Requirement,Workflow,Unit test IDs,API test IDs,Browser test IDs,Security evidence,Performance evidence,Status and limits
+FR-01,W1,UT-TRANSITION-REJECT-REQUIRED-01,API-POST-EXHIBITNAME-1..8; API-PATCH-EXHIBITNAME-1..7,UC-01 (Main/A2/E1),Not applicable,Not applicable,Executed & passing (unit + live 62-case API + UC-01 keyboard E2E + axe-core)
+FR-02,W1,UT-TRANSITION-REJECT-REQUIRED-01,API-POST-CATEGORYID-9..12; API-PATCH-CATEGORYID-8..10,UC-01 (Main/E2),Not applicable,Not applicable,Executed & passing (unit + live API + UC-01 E2 invalid category 400)
+FR-03,W1,UT-YEAR-01..09 (production Zod),API-POST-YEAR-13..22; API-PATCH-YEAR-11..20,UC-05 (E1 out-of-range 1799),Not applicable,Not applicable,Executed & passing across unit + live API + UC-05 browser E2E
+FR-04,W1,UT-PRICE-01..06 (production Zod),API-POST-PRICE-23..28; API-PATCH-PRICE-21..26,UC-01 (A1 null); UC-05 (A1 clear),Not applicable,Not applicable,Executed & passing across unit + live API + UC-01/UC-05 browser E2E
+FR-05,W1,ExhibitsService.create/generateDisplayId,API-POST-READBACK-01; API-EXHIBIT-404,UC-01; UC-04; UC-06,ZAP passive scan,K6-EXHIBIT-READ (16.4-28.2 ms p95) + db-recovery-run.json (P2003),Executed & passing (live displayId readback + k6 + DB recovery + ZAP)
+FR-06,W2,UT-PUBLISH-01..08; PermissionGuard,API-LIFECYCLE-VALIDATE-01; API-AUTH-401/403,UC-02; UC-03,access-checks.json (7 checks) + ZAP passive,Not applicable,Executed & passing (unit + live API + 7-check RBAC + ZAP passive)
+FR-07,W2,UT-TRANSITION-T1..T8; ExhibitsController.update,API-LIFECYCLE-REJECT-01; API-LIFECYCLE-PUBLISH-01,UC-02 (Main/E1); UC-03,access-checks.json + cookie-security-check.json,Not applicable,Executed & passing (unit + live API + browser error guidance + cookie check)
+FR-08,W2,UT-TERMINAL-T6..T8; ExhibitsController.update,API-LIFECYCLE-PUBLISHED-TO-DRAFT,UC-02 (A2/E2 terminal guard),Not applicable,Not applicable,Executed & passing across unit + live API + UC-02 browser E2E

@@ -1,0 +1,16 @@
+{
+  "key": "MuseumOS-SQE-final",
+  "name": "MuseumOS-SQE-final",
+  "qualifier": "TRK",
+  "measures": [
+    {
+      "metric": "complexity",
+      "value": "5683"
+    },
+    {
+      "metric": "cognitive_complexity",
+      "value": "3614",
+      "bestValue": false
+    }
+  ]
+}

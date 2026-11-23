@@ -48,6 +48,7 @@ export function Header({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
       {onToggleSidebar && (
         <button
           onClick={onToggleSidebar}
+          aria-label="Open navigation menu"
           className="relative z-10 rounded p-1.5 hover:bg-white/20 dark:hover:bg-white/10 lg:hidden"
         >
           <Menu className="h-5 w-5" />
@@ -69,6 +70,7 @@ export function Header({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
             </span>
             <button
               onClick={logout}
+              aria-label={t('common.logout') as string}
               className="flex items-center gap-1.5 text-sm font-medium text-[#1e3a5f]/70 transition-colors hover:text-destructive dark:text-muted-foreground"
             >
               <LogOut className="h-3.5 w-3.5" />
@@ -85,6 +87,7 @@ export function Header({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
             </span>
             <button
               onClick={logout}
+              aria-label={t('common.logout') as string}
               className="flex items-center gap-1.5 rounded-control px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
             >
               <LogOut className="h-3.5 w-3.5" />
