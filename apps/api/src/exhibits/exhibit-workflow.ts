@@ -18,7 +18,7 @@ export interface ExhibitStateTransition {
 }
 
 export function isAcquisitionYearAllowed(year: number | null): boolean {
-  return year === null || (Number.isInteger(year) && year >= 1800 && year <= 2100);
+  return year === null || (Number.isInteger(year) && year > 1800 && year <= 2100);
 }
 
 export function isCollectiblePriceAllowed(price: number | null): boolean {
