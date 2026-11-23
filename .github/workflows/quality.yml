@@ -118,4 +118,10 @@ jobs:
           curl -sf http://localhost:3000/api/health
           pnpm test:api
           pnpm test:recovery:db
+          # Allow the 10s medium ThrottlerGuard window (100 req/10s) to reset after the 124-request API burst.
+          sleep 11
           pnpm test:e2e --workers=1 --reporter=line
+
+      - name: Print API server log on failure
+        if: failure()
+        run: test -f /tmp/api.log && tail -n 80 /tmp/api.log || echo "No /tmp/api.log"

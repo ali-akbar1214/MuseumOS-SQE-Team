@@ -123,9 +123,14 @@ test.describe('UC-04: Search and inspect an exhibit (Burhan Ahmed)', () => {
 
     await page.goto('/exhibits');
     const searchInput = page.getByPlaceholder(/search exhibits/i);
+    await expect(searchInput).toBeVisible();
 
     // UC-04 Main: search by unique name and inspect detail
+    const searchPromise = page.waitForResponse(
+      (res) => res.url().includes('/api/exhibits') && res.url().includes(encodeURIComponent(uniqueToken)) && res.status() === 200,
+    );
     await searchInput.fill(uniqueToken);
+    await searchPromise;
     await expect(page.getByText(created.exhibitName)).toBeVisible({ timeout: 10_000 });
 
     // UC-04-A1: narrow with category filter
