@@ -1,0 +1,19 @@
+{
+  "capturedAt": "2026-11-23T20:21:41.629Z",
+  "screens": [
+    {
+      "screen": "exhibits-list",
+      "url": "http://localhost:5173/exhibits",
+      "accessibility": 1,
+      "bestPractices": 1,
+      "seo": 0.82
+    },
+    {
+      "screen": "exhibit-detail",
+      "url": "http://localhost:5173/exhibits/d1e491cb-0978-428c-baef-b6020eaf6b29",
+      "accessibility": 1,
+      "bestPractices": 1,
+      "seo": 0.82
+    }
+  ]
+}

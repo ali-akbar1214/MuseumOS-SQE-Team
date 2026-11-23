@@ -1,4 +1,0 @@
-Upstream: https://github.com/akolit/MuseumOS
-License: AGPL-3.0
-Baseline commit: 0ef7004ebef1c59130101fa0a56c95a50ca31900
-Team setup baseline: cloned as of 2026-11-21

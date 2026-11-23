@@ -1,0 +1,54 @@
+{
+  "capturedAt": "2026-11-23T20:27:35.183Z",
+  "checks": [
+    {
+      "role": "viewer",
+      "action": "read exhibit catalogue",
+      "expected": 200,
+      "observed": 200,
+      "evidence": "GET /api/exhibits"
+    },
+    {
+      "role": "viewer",
+      "action": "create exhibit",
+      "expected": 403,
+      "observed": 403,
+      "evidence": "POST /api/exhibits"
+    },
+    {
+      "role": "curator",
+      "action": "read exhibit catalogue",
+      "expected": 200,
+      "observed": 200,
+      "evidence": "GET /api/exhibits"
+    },
+    {
+      "role": "curator",
+      "action": "create exhibit",
+      "expected": 201,
+      "observed": 201,
+      "evidence": "POST /api/exhibits"
+    },
+    {
+      "role": "curator",
+      "action": "validate exhibit",
+      "expected": 403,
+      "observed": 403,
+      "evidence": "PATCH /api/exhibits/3e3d641b-2288-404f-a440-595b8a297a2d"
+    },
+    {
+      "role": "curator",
+      "action": "publish exhibit",
+      "expected": 403,
+      "observed": 403,
+      "evidence": "PATCH /api/exhibits/3e3d641b-2288-404f-a440-595b8a297a2d"
+    },
+    {
+      "role": "admin",
+      "action": "validate exhibit",
+      "expected": 200,
+      "observed": 200,
+      "evidence": "PATCH /api/exhibits/3e3d641b-2288-404f-a440-595b8a297a2d"
+    }
+  ]
+}

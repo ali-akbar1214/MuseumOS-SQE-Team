@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Keep success toast copy readable against Sonner's pale success background. */
+[data-sonner-toast][data-type="success"] [data-title] {
+  color: #166534 !important;
+}
+
 @layer base {
   :root {
     /* Light theme (default) */
@@ -78,7 +83,7 @@
     --card-foreground: 220 14% 10%;
     --popover: 0 0% 100%;
     --popover-foreground: 220 14% 10%;
-    --primary: 221 83% 53%;
+    --primary: 221 83% 45%;
     --primary-foreground: 0 0% 100%;
     --secondary: 214 20% 92%;
     --secondary-foreground: 220 14% 10%;

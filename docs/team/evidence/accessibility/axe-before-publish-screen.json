@@ -1,0 +1,148 @@
+{
+  "capturedAt": "2026-11-22T11:42:56.802Z",
+  "url": "http://localhost:5173/exhibits/94ff72ee-b095-4875-b043-98f846483cce",
+  "violations": [
+    {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": [
+        {
+          "target": [
+            "li[data-index=\"0\"] > div[data-content=\"\"] > div[data-title=\"\"]"
+          ],
+          "impact": "serious",
+          "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.7 (foreground color: #47ac69, background color: #f0fcf5, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+        },
+        {
+          "target": [
+            "li[data-index=\"1\"] > div[data-content=\"\"] > div[data-title=\"\"]"
+          ],
+          "impact": "serious",
+          "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.37 (foreground color: #b3e1c3, background color: #ecfdf3, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+        },
+        {
+          "target": [
+            ".bg-primary\\/10"
+          ],
+          "impact": "serious",
+          "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.49 (foreground color: #2463eb, background color: #e9effd, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+        },
+        {
+          "target": [
+            "a[href$=\"timeline\"] > .bg-primary\\/15.uppercase.leading-none"
+          ],
+          "impact": "serious",
+          "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.2 (foreground color: #2463eb, background color: #dee8fc, font size: 7.5pt (10px), font weight: normal). Expected contrast ratio of 4.5:1"
+        },
+        {
+          "target": [
+            "a[href$=\"financials\"] > .bg-primary\\/15.uppercase.leading-none"
+          ],
+          "impact": "serious",
+          "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.2 (foreground color: #2463eb, background color: #dee8fc, font size: 7.5pt (10px), font weight: normal). Expected contrast ratio of 4.5:1"
+        },
+        {
+          "target": [
+            "a[href$=\"marketing\"] > .bg-primary\\/15.uppercase.leading-none"
+          ],
+          "impact": "serious",
+          "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.2 (foreground color: #2463eb, background color: #dee8fc, font size: 7.5pt (10px), font weight: normal). Expected contrast ratio of 4.5:1"
+        },
+        {
+          "target": [
+            "div:nth-child(1) > dd > .text-green-600.inline-flex.gap-1"
+          ],
+          "impact": "serious",
+          "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+        },
+        {
+          "target": [
+            "div:nth-child(2) > dd > .text-green-600.inline-flex.gap-1"
+          ],
+          "impact": "serious",
+          "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+        }
+      ]
+    },
+    {
+      "id": "dlitem",
+      "impact": "serious",
+      "help": "<dt> and <dd> elements must be contained by a <dl>",
+      "nodes": [
+        {
+          "target": [
+            "div:nth-child(1) > dt"
+          ],
+          "impact": "serious",
+          "summary": "Fix any of the following:\n  Description list item does not have a <dl> parent element"
+        },
+        {
+          "target": [
+            "div:nth-child(1) > dd"
+          ],
+          "impact": "serious",
+          "summary": "Fix any of the following:\n  Description list item does not have a <dl> parent element"
+        },
+        {
+          "target": [
+            "div:nth-child(2) > dt"
+          ],
+          "impact": "serious",
+          "summary": "Fix any of the following:\n  Description list item does not have a <dl> parent element"
+        },
+        {
+          "target": [
+            "div:nth-child(2) > dd"
+          ],
+          "impact": "serious",
+          "summary": "Fix any of the following:\n  Description list item does not have a <dl> parent element"
+        },
+        {
+          "target": [
+            "div:nth-child(3) > dt"
+          ],
+          "impact": "serious",
+          "summary": "Fix any of the following:\n  Description list item does not have a <dl> parent element"
+        },
+        {
+          "target": [
+            "div:nth-child(3) > dd"
+          ],
+          "impact": "serious",
+          "summary": "Fix any of the following:\n  Description list item does not have a <dl> parent element"
+        },
+        {
+          "target": [
+            "div:nth-child(4) > dt"
+          ],
+          "impact": "serious",
+          "summary": "Fix any of the following:\n  Description list item does not have a <dl> parent element"
+        },
+        {
+          "target": [
+            "div:nth-child(4) > dd"
+          ],
+          "impact": "serious",
+          "summary": "Fix any of the following:\n  Description list item does not have a <dl> parent element"
+        }
+      ]
+    },
+    {
+      "id": "heading-order",
+      "impact": "moderate",
+      "help": "Heading levels should only increase by one",
+      "nodes": [
+        {
+          "target": [
+            "h3"
+          ],
+          "impact": "moderate",
+          "summary": "Fix any of the following:\n  Heading order invalid"
+        }
+      ]
+    }
+  ],
+  "passes": 32,
+  "incomplete": 1
+}
