@@ -87,7 +87,7 @@ jobs:
         run: pnpm test:data:constraints
 
       - name: SonarCloud static analysis & quality gate
-        if: ${{ secrets.SONAR_TOKEN != '' }}
+        if: vars.SONAR_ENABLED == 'true'
         uses: SonarSource/sonarqube-scan-action@v4
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
