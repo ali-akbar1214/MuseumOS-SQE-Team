@@ -122,6 +122,11 @@ jobs:
           sleep 11
           pnpm test:e2e --workers=1 --reporter=line
 
-      - name: Print API server log on failure
+      - name: Print server logs and Playwright error context on failure
         if: failure()
-        run: test -f /tmp/api.log && tail -n 80 /tmp/api.log || echo "No /tmp/api.log"
+        run: |
+          if [ -f /tmp/api.log ]; then echo "=== /tmp/api.log ==="; tail -n 80 /tmp/api.log; fi
+          if [ -f /tmp/web.log ]; then echo "=== /tmp/web.log ==="; tail -n 80 /tmp/web.log; fi
+          for ctx in test-results/playwright/*/error-context.md; do
+            if [ -f "$ctx" ]; then echo "=== $ctx ==="; head -n 120 "$ctx"; fi
+          done

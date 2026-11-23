@@ -117,20 +117,23 @@ test.describe('UC-04: Search and inspect an exhibit (Burhan Ahmed)', () => {
   test('UC-04 Main + A1 + A2 + E1 + E2: search, category filter, empty state, invalid query, and unknown ID 404', async ({
     page,
   }) => {
+    // Allow the 10 s medium ThrottlerGuard window to drain after UC-03's 3-role login burst without weakening production rate limits.
+    await page.waitForTimeout(6_000);
     await loginAdmin(page);
     const uniqueToken = `SQEFind${Date.now()}`;
     const created = await createDraftThroughApi(page, `${uniqueToken} Retro Machine`, cleanupIds);
 
-    await page.goto('/exhibits');
+    await page.goto('/exhibits', { waitUntil: 'networkidle' });
     const searchInput = page.getByPlaceholder(/search exhibits/i);
     await expect(searchInput).toBeVisible();
 
     // UC-04 Main: search by unique name and inspect detail
     const searchPromise = page.waitForResponse(
-      (res) => res.url().includes('/api/exhibits') && res.url().includes(encodeURIComponent(uniqueToken)) && res.status() === 200,
+      (res) => res.url().includes('/api/exhibits') && res.url().includes(encodeURIComponent(uniqueToken)),
     );
     await searchInput.fill(uniqueToken);
-    await searchPromise;
+    const searchResp = await searchPromise;
+    expect(searchResp.status()).toBe(200);
     await expect(page.getByText(created.exhibitName)).toBeVisible({ timeout: 10_000 });
 
     // UC-04-A1: narrow with category filter
@@ -145,7 +148,7 @@ test.describe('UC-04: Search and inspect an exhibit (Burhan Ahmed)', () => {
     await expect(page.getByText(created.displayId)).toBeVisible();
 
     // UC-04-A2: no matching result shows understandable empty state
-    await page.goto('/exhibits');
+    await page.goto('/exhibits', { waitUntil: 'networkidle' });
     await searchInput.fill(`NoMatchTokenXYZ${Date.now()}`);
     await expect(page.getByText(/no exhibits found/i)).toBeVisible({ timeout: 10_000 });
 

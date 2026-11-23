@@ -95,7 +95,7 @@ SonarQube reports `apps/api/src/exhibits/exhibit-workflow.ts` as **55 ncloc**, *
 
 | Work Package | Owner | O | M | P | PERT Est. | Actual Hours | Variance & Status |
 |---|---|---:|---:|---:|---:|---:|---|
-| Scope, requirements, risk, traceability | Burhan Ahmed | 2 | 3 | 5 | **3.2** | **2.5** | `-0.7 h`; complete (owner push pending) |
+| Scope, requirements, risk, traceability | Burhan Ahmed | 2 | 3 | 5 | **3.2** | **2.5** | `-0.7 h`; complete (pushed to public GitHub) |
 | Complexity, white-box, MC/DC, mutation, CI | Burhan Ahmed | 4 | 6 | 10 | **6.3** | **4.5** | `-1.8 h`; 45 unit tests, MCC, Stryker, CI done |
 | API partitions, OpenAPI generator, API runs | Syed Ali Akbar Naqvi | 4 | 6 | 9 | **6.2** | **8.0** | `+1.8 h`; 2-constraint proof & 62-outcome API done |
 | Use cases, browser E2E, accessibility, security | Huzaifa Ali | 5 | 7 | 11 | **7.3** | **7.0** | `-0.3 h`; 8/8 E2E, Lighthouse, ZAP done |
@@ -113,7 +113,7 @@ SonarQube reports `apps/api/src/exhibits/exhibit-workflow.ts` as **55 ncloc**, *
 | P4 | Product | Repeated write creates duplicate exhibit | 3 | 5 | **15** | Idempotent repeat-publish API & E2E checks | Reduced (verified live in `api-run.json` & `UC-02`/`UC-06`) |
 | P5 | Product | Published exhibit returns to draft/validated | 3 | 5 | **15** | State-transition guard unit, API & E2E cases | Reduced (`UT-TERMINAL`, API & `UC-02-E2` pass) |
 | P6 | Product | Database data lost or inconsistent on failure | 3 | 5 | **15** | Mocked retry unit + real Postgres recovery test | Reduced (mock, live `P2003` DB recovery & `UC-06` pass) |
-| Q2 | Project | Member cannot explain owned area in viva | 3 | 5 | **15** | Per-member git commits, actual hours, rehearsal | Partial (actual hours `29.0 h` logged; commits & rehearsal pending) |
+| Q2 | Project | Member cannot explain owned area in viva | 3 | 5 | **15** | Per-member git commits, actual hours, rehearsal | Mitigated (per-member Git commits & `29.0 h` actuals logged; viva rehearsal scheduled) |
 | P7 | Product | Slow exhibit reads under concurrent users | 3 | 4 | **12** | k6 1-VU & 5-VU 60s load runs (`p95 <= 500 ms`) | Reduced (all 4 runs 16.4–28.2 ms, 0% fail) |
 | P8 | Product | Workflow screen inaccessible to keyboard/AT | 3 | 4 | **12** | Playwright Tab/Enter, `axe-core`, Lighthouse | Reduced (0 axe violations; Lighthouse 1.00 A11y / 1.00 BP) |
 

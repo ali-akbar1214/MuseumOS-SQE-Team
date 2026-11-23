@@ -5,14 +5,18 @@ from zipfile import ZIP_DEFLATED, ZipFile
 ROOT = Path(__file__).resolve().parents[2]
 OUTPUT = ROOT.parent / 'Deliverables' / 'Project_24I-3030_24I-3079_24I-3114_C.zip'
 EXCLUDED_DIRS = {
-    'node_modules', 'dist', '.turbo', 'coverage', 'work', 'test-results',
+    'node_modules', 'dist', '.turbo', 'work', 'test-results',
     '.venv', '__pycache__', '.stryker-tmp',
 }
 
 
+def is_excluded_coverage(rel_parts: tuple[str, ...]) -> bool:
+    return 'coverage' in rel_parts and rel_parts[:3] != ('docs', 'team', 'evidence')
+
+
 def include(path: Path) -> bool:
     rel = path.relative_to(ROOT)
-    if any(part in EXCLUDED_DIRS for part in rel.parts):
+    if any(part in EXCLUDED_DIRS for part in rel.parts) or is_excluded_coverage(rel.parts):
         return False
     if rel.parts and rel.parts[0] == 'reports' and path.suffix.lower() == '.png' and path.name.startswith(('final-report', 'final-qa', 'final-layout', 'last-check')):
         return False
@@ -33,9 +37,12 @@ def main():
     files = []
     for current, directories, names in os.walk(ROOT, topdown=True, followlinks=False):
         current_path = Path(current)
+        rel_dir = current_path.relative_to(ROOT)
         directories[:] = [
             name for name in directories
-            if name not in EXCLUDED_DIRS and not (current_path / name).is_symlink()
+            if name not in EXCLUDED_DIRS
+            and not is_excluded_coverage(rel_dir.parts + (name,))
+            and not (current_path / name).is_symlink()
         ]
         files.extend(
             path for name in names
