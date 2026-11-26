@@ -74,15 +74,30 @@ SCANNER_ARGS=(
 echo "=== SonarQube Pass 1: discover hotspots ==="
 docker "${SCANNER_ARGS[@]}" -Dsonar.qualitygate.wait=false
 
-for _ in $(seq 1 45); do
-  EMPTY=$(curl -sf -u admin:admin "http://127.0.0.1:9001/api/ce/component?component=MuseumOS-SQE-final" | node -e "const d=JSON.parse(require('fs').readFileSync(0,'utf8')); process.stdout.write(!d.queue || d.queue.length===0 ? '1' : '0');")
-  if [ "$EMPTY" = "1" ]; then
+CE_DONE=0
+for _ in $(seq 1 60); do
+  CE_STATUS=$(curl -sf -u admin:admin "http://127.0.0.1:9001/api/ce/component?component=MuseumOS-SQE-final" | node -e "
+    const d = JSON.parse(require('fs').readFileSync(0,'utf8'));
+    const qLen = Array.isArray(d.queue) ? d.queue.length : 0;
+    const cur = d.current ? d.current.status : '';
+    process.stdout.write(qLen === 0 && cur === 'SUCCESS' ? 'DONE' : cur || 'WAIT');
+  ")
+  if [ "$CE_STATUS" = "DONE" ]; then
+    CE_DONE=1
     break
   fi
   sleep 2
 done
+if [ "$CE_DONE" -ne 1 ]; then
+  echo "SonarQube Pass 1 Compute Engine task did not complete cleanly" >&2
+  exit 1
+fi
 
-HOTSPOT_KEYS=$(curl -sf -u admin:admin "http://127.0.0.1:9001/api/hotspots/search?projectKey=MuseumOS-SQE-final&status=TO_REVIEW" | node -e "
+HOTSPOTS_JSON=$(curl -sf -u admin:admin "http://127.0.0.1:9001/api/hotspots/search?projectKey=MuseumOS-SQE-final&status=TO_REVIEW")
+echo "=== Pass 1 TO_REVIEW hotspots ==="
+echo "$HOTSPOTS_JSON"
+
+HOTSPOT_KEYS=$(printf '%s' "$HOTSPOTS_JSON" | node -e "
 const d = JSON.parse(require('fs').readFileSync(0,'utf8'));
 for (const hs of (d.hotspots || [])) {
   if (/branding\.ts|dashboard\.tsx|not-found\.tsx/.test(hs.component || '')) {
@@ -96,10 +111,21 @@ for key in $HOTSPOT_KEYS; do
 done
 
 echo "=== SonarQube Pass 2: enforced overall-code quality gate (-Dsonar.qualitygate.wait=true) ==="
-docker "${SCANNER_ARGS[@]}" -Dsonar.qualitygate.wait=true
+SCAN_RC=0
+if ! docker "${SCANNER_ARGS[@]}" -Dsonar.qualitygate.wait=true; then
+  SCAN_RC=$?
+fi
 
 STATUS_JSON=$(curl -sf -u admin:admin "http://127.0.0.1:9001/api/qualitygates/project_status?projectKey=MuseumOS-SQE-final")
+echo "=== Final SonarQube Quality Gate Status ==="
 echo "$STATUS_JSON"
+curl -sf -u admin:admin "http://127.0.0.1:9001/api/measures/component?component=MuseumOS-SQE-final&metricKeys=bugs,vulnerabilities,code_smells,reliability_rating,security_rating,sqale_rating,duplicated_lines_density,security_hotspots,security_hotspots_reviewed"
+echo ""
+
+if [ "$SCAN_RC" -ne 0 ]; then
+  exit "$SCAN_RC"
+fi
+
 printf '%s' "$STATUS_JSON" | node -e "
 const d = JSON.parse(require('fs').readFileSync(0,'utf8'));
 const ps = d.projectStatus || {};
