@@ -1,54 +1,94 @@
 {
-  "capturedAt": "2026-11-23T20:27:35.183Z",
+  "capturedAt": "2026-11-26T10:29:07.545Z",
+  "totalChecks": 11,
   "checks": [
     {
       "role": "viewer",
       "action": "read exhibit catalogue",
+      "endpoint": "GET /api/exhibits",
       "expected": 200,
       "observed": 200,
-      "evidence": "GET /api/exhibits"
-    },
-    {
-      "role": "viewer",
-      "action": "create exhibit",
-      "expected": 403,
-      "observed": 403,
-      "evidence": "POST /api/exhibits"
+      "statePreserved": true
     },
     {
       "role": "curator",
       "action": "read exhibit catalogue",
+      "endpoint": "GET /api/exhibits",
       "expected": 200,
       "observed": 200,
-      "evidence": "GET /api/exhibits"
+      "statePreserved": true
     },
     {
       "role": "curator",
-      "action": "create exhibit",
+      "action": "create draft exhibit",
+      "endpoint": "POST /api/exhibits",
       "expected": 201,
       "observed": 201,
-      "evidence": "POST /api/exhibits"
-    },
-    {
-      "role": "curator",
-      "action": "validate exhibit",
-      "expected": 403,
-      "observed": 403,
-      "evidence": "PATCH /api/exhibits/3e3d641b-2288-404f-a440-595b8a297a2d"
-    },
-    {
-      "role": "curator",
-      "action": "publish exhibit",
-      "expected": 403,
-      "observed": 403,
-      "evidence": "PATCH /api/exhibits/3e3d641b-2288-404f-a440-595b8a297a2d"
+      "statePreserved": true
     },
     {
       "role": "admin",
       "action": "validate exhibit",
+      "endpoint": "PATCH /api/exhibits/:id",
       "expected": 200,
       "observed": 200,
-      "evidence": "PATCH /api/exhibits/3e3d641b-2288-404f-a440-595b8a297a2d"
+      "statePreserved": true
+    },
+    {
+      "role": "unauthenticated",
+      "action": "read exhibit catalogue",
+      "endpoint": "GET /api/exhibits",
+      "expected": 401,
+      "observed": 401,
+      "statePreserved": true
+    },
+    {
+      "role": "unauthenticated",
+      "action": "create exhibit",
+      "endpoint": "POST /api/exhibits",
+      "expected": 401,
+      "observed": 401,
+      "statePreserved": true
+    },
+    {
+      "role": "unauthenticated",
+      "action": "validate exhibit",
+      "endpoint": "PATCH /api/exhibits/:id",
+      "expected": 401,
+      "observed": 401,
+      "statePreserved": true
+    },
+    {
+      "role": "viewer",
+      "action": "create exhibit",
+      "endpoint": "POST /api/exhibits",
+      "expected": 403,
+      "observed": 403,
+      "statePreserved": true
+    },
+    {
+      "role": "viewer",
+      "action": "validate exhibit",
+      "endpoint": "PATCH /api/exhibits/:id",
+      "expected": 403,
+      "observed": 403,
+      "statePreserved": true
+    },
+    {
+      "role": "curator",
+      "action": "validate exhibit",
+      "endpoint": "PATCH /api/exhibits/:id",
+      "expected": 403,
+      "observed": 403,
+      "statePreserved": true
+    },
+    {
+      "role": "curator",
+      "action": "publish exhibit",
+      "endpoint": "PATCH /api/exhibits/:id",
+      "expected": 403,
+      "observed": 403,
+      "statePreserved": true
     }
   ]
 }

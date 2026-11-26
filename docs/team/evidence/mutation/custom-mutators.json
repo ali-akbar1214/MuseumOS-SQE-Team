@@ -1,6 +1,8 @@
 {
+  "capturedAt": "2026-11-26T23:12:25.721Z",
   "source": "apps/api/src/exhibits/exhibit-workflow.ts",
-  "method": "source-level domain mutation; each mutant compiled with TypeScript and checked against a named boundary oracle",
+  "method": "source-level domain mutation evaluated directly against the real Vitest team unit suite with guaranteed original-source restoration",
+  "suiteCommand": "pnpm --filter @museumos/api exec vitest run test/team/exhibit-workflow.test.ts test/team/exhibit-contracts.test.ts",
   "customOperators": [
     "inclusive numeric boundary to exclusive",
     "boolean conjunction to disjunction"
@@ -11,22 +13,22 @@
   "outcomes": [
     {
       "id": "PRICE-INCLUSIVE-ZERO",
-      "test": "price-zero",
+      "exitCode": 1,
       "outcome": "KILLED"
     },
     {
       "id": "YEAR-INCLUSIVE-LOWER",
-      "test": "year-minimum",
+      "exitCode": 1,
       "outcome": "KILLED"
     },
     {
       "id": "YEAR-INCLUSIVE-UPPER",
-      "test": "year-maximum",
+      "exitCode": 1,
       "outcome": "KILLED"
     },
     {
       "id": "PUBLISH-AND-OR",
-      "test": "publish-needs-validation",
+      "exitCode": 1,
       "outcome": "KILLED"
     }
   ]

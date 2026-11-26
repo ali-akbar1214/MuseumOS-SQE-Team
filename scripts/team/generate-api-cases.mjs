@@ -8,6 +8,7 @@ const document = parse(fs.readFileSync(specPath, 'utf8'));
 const schema = document.components?.schemas?.CreateExhibit;
 if (!schema?.properties) throw new Error('OpenAPI document must define components.schemas.CreateExhibit.properties');
 
+const querySchema = document.components?.schemas?.SearchExhibitsQuery;
 const required = new Set(schema.required ?? []);
 const validSamples = { string: 'SQE generated exhibit', integer: 2000, number: 25, boolean: true };
 
@@ -22,10 +23,19 @@ function add(cases, value, valid, partition, technique) {
   cases.push({ exists: true, value, valid, partitions: [partition], techniques: [technique] });
 }
 
-function generatePropertyCases(name, property) {
+function generatePropertyCases(name, property, requiredSet) {
   const cases = [];
   const type = Array.isArray(property.type) ? property.type.find((item) => item !== 'null') : property.type;
   const nullable = property.nullable === true || (Array.isArray(property.type) && property.type.includes('null'));
+
+  if (Array.isArray(property.enum) && property.enum.length > 0) {
+    for (const val of property.enum) {
+      add(cases, val, true, `valid-enum-${val}`, 'EP');
+    }
+    add(cases, '__invalid_enum__', false, 'invalid-enum', 'EP');
+    add(cases, 42, false, 'wrong-type-number', 'EP');
+    return cases;
+  }
 
   if (type === 'string' && property.format === 'uuid') {
     add(cases, '__CATEGORY_ID__', true, 'valid-uuid', 'EP');
@@ -80,21 +90,31 @@ function generatePropertyCases(name, property) {
 
   if (type === 'string') add(cases, 42, false, 'wrong-type-number', 'EP');
   if (type === 'integer' || type === 'number') add(cases, 'not-a-number', false, 'wrong-type-string', 'EP');
-  if (required.has(name)) cases.push({ exists: false, value: null, valid: false, partitions: ['missing-required'], techniques: ['EP'] });
+  if (requiredSet.has(name)) cases.push({ exists: false, value: null, valid: false, partitions: ['missing-required'], techniques: ['EP'] });
   return cases;
 }
 
-const properties = Object.fromEntries(
-  Object.entries(schema.properties).map(([name, property]) => [name, {
-    required: required.has(name),
-    type: property.type,
-    minimum: property.minimum,
-    maximum: property.maximum,
-    minLength: property.minLength,
-    maxLength: property.maxLength,
-    cases: generatePropertyCases(name, property),
-  }]),
-);
+function buildPropertyMap(targetSchema) {
+  const reqSet = new Set(targetSchema.required ?? []);
+  return Object.fromEntries(
+    Object.entries(targetSchema.properties).map(([name, property]) => [
+      name,
+      {
+        required: reqSet.has(name),
+        type: property.type,
+        enum: property.enum,
+        minimum: property.minimum,
+        maximum: property.maximum,
+        minLength: property.minLength,
+        maxLength: property.maxLength,
+        cases: generatePropertyCases(name, property, reqSet),
+      },
+    ]),
+  );
+}
+
+const properties = buildPropertyMap(schema);
+const queryProperties = querySchema?.properties ? buildPropertyMap(querySchema) : {};
 
 const generated = {
   generatedFrom: path.relative(process.cwd(), specPath),
@@ -102,7 +122,12 @@ const generated = {
   schema: 'CreateExhibit',
   generatedAt: new Date().toISOString(),
   properties,
+  queryProperties,
 };
 fs.mkdirSync(path.dirname(outputPath), { recursive: true });
 fs.writeFileSync(outputPath, `${JSON.stringify(generated, null, 2)}\n`);
-console.log(`Generated ${Object.values(properties).reduce((count, item) => count + item.cases.length, 0)} cases for ${Object.keys(properties).length} OpenAPI inputs -> ${outputPath}`);
+const createCount = Object.values(properties).reduce((count, item) => count + item.cases.length, 0);
+const queryCount = Object.values(queryProperties).reduce((count, item) => count + item.cases.length, 0);
+console.log(
+  `Generated ${createCount} create cases (${Object.keys(properties).length} inputs) + ${queryCount} query cases (${Object.keys(queryProperties).length} params) -> ${outputPath}`,
+);

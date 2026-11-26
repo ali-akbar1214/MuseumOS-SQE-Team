@@ -135,4 +135,42 @@ describe('exhibit workflow business rules', () => {
       nextPublished: false,
     })).toEqual({ allowed: false, reason: 'A published exhibit cannot return to draft or validated state' });
   });
+
+  it('UT-TRANSITION-VALIDATED-DISALLOWED-01 rejects invalid transitions out of validated while allowing validated -> draft un-validation', () => {
+    const validated = record({ validated: true, published: false });
+    // MuseumOS deliberately permits validated -> draft so senior curators can un-validate an unpublished exhibit for revision.
+    expect(validateExhibitTransition({
+      exhibitName: validated.exhibitName,
+      categoryId: validated.categoryId,
+      current: validated,
+      nextValidated: false,
+      nextPublished: false,
+    })).toEqual({ allowed: true });
+
+    // Transitioning validated -> published fails if required invariants (exhibitName / categoryId) are broken:
+    expect(validateExhibitTransition({
+      exhibitName: '   ',
+      categoryId: validated.categoryId,
+      current: validated,
+      nextValidated: true,
+      nextPublished: true,
+    })).toEqual({ allowed: false, reason: 'Exhibit name is required' });
+
+    expect(validateExhibitTransition({
+      exhibitName: validated.exhibitName,
+      categoryId: null,
+      current: validated,
+      nextValidated: true,
+      nextPublished: true,
+    })).toEqual({ allowed: false, reason: 'A category is required' });
+
+    // Transitioning validated -> published while simultaneously clearing validated fails precondition:
+    expect(validateExhibitTransition({
+      exhibitName: validated.exhibitName,
+      categoryId: validated.categoryId,
+      current: validated,
+      nextValidated: false,
+      nextPublished: true,
+    })).toEqual({ allowed: false, reason: 'An exhibit must be validated before it can be published' });
+  });
 });

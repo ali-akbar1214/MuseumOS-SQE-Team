@@ -2,14 +2,17 @@ import type { ExecutionContext } from '@nestjs/common';
 import { ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { describe, expect, it, vi } from 'vitest';
+import { PERMISSION_KEY } from '../../src/auth/decorators/require-permission.decorator';
 import { PermissionGuard } from '../../src/auth/guards/permission.guard';
 import type { SessionUser } from '../../src/auth/auth.service';
 
 function makeContext(user?: Partial<SessionUser>): ExecutionContext {
   const request = { user };
+  const handler = () => undefined;
+  class DummyController {}
   return {
-    getHandler: () => (() => undefined),
-    getClass: () => class DummyController {},
+    getHandler: () => handler,
+    getClass: () => DummyController,
     switchToHttp: () => ({
       getRequest: () => request,
     }),
@@ -18,10 +21,13 @@ function makeContext(user?: Partial<SessionUser>): ExecutionContext {
 
 describe('PermissionGuard RBAC enforcement', () => {
   it('allows requests when no permission metadata is declared', () => {
-    const reflector = { getAllAndOverride: vi.fn(() => undefined) } as unknown as Reflector;
+    const getAllAndOverride = vi.fn(() => undefined);
+    const reflector = { getAllAndOverride } as unknown as Reflector;
     const guard = new PermissionGuard(reflector);
+    const ctx = makeContext();
 
-    expect(guard.canActivate(makeContext())).toBe(true);
+    expect(guard.canActivate(ctx)).toBe(true);
+    expect(getAllAndOverride).toHaveBeenCalledWith(PERMISSION_KEY, [ctx.getHandler(), ctx.getClass()]);
   });
 
   it('throws ForbiddenException when user is missing on a protected route', () => {

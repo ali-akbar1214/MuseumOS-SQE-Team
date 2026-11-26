@@ -133,7 +133,7 @@ export function ExhibitsPage() {
   const imagesMenuRef = useRef<HTMLDivElement>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkOpen, setBulkOpen] = useState(false);
-  const [newExhibitOpen, setNewExhibitOpen] = useState(false);
+  const [newExhibitOpen, setNewExhibitOpen] = useState(() => params.get('new') === '1');
   const queryClient = useQueryClient();
   const { hasPermission } = useAuth();
   const canEdit = hasPermission('exhibit:write');

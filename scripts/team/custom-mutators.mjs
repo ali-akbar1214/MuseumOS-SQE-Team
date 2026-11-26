@@ -1,48 +1,53 @@
 import fs from 'node:fs';
-import vm from 'node:vm';
-import path from 'node:path';
-import { createRequire } from 'node:module';
-const apiRequire = createRequire(path.resolve('apps/api/package.json'));
-const ts = apiRequire('typescript');
+import { spawnSync } from 'node:child_process';
 
 const sourcePath = 'apps/api/src/exhibits/exhibit-workflow.ts';
 const original = fs.readFileSync(sourcePath, 'utf8');
-const cases = [
-  { name: 'price-zero', fn: 'isCollectiblePriceAllowed', args: [0], expected: true },
-  { name: 'year-minimum', fn: 'isAcquisitionYearAllowed', args: [1800], expected: true },
-  { name: 'year-maximum', fn: 'isAcquisitionYearAllowed', args: [2100], expected: true },
-  { name: 'publish-needs-validation', fn: 'isPublishAllowed', args: [{ validated: false, exhibitName: 'Valid name', categoryId: 'cat' }], expected: false },
-];
 
 const operators = [
-  { id: 'PRICE-INCLUSIVE-ZERO', pattern: 'price >= 0', replacement: 'price > 0', caseName: 'price-zero' },
-  { id: 'YEAR-INCLUSIVE-LOWER', pattern: 'year >= 1800', replacement: 'year > 1800', caseName: 'year-minimum' },
-  { id: 'YEAR-INCLUSIVE-UPPER', pattern: 'year <= 2100', replacement: 'year < 2100', caseName: 'year-maximum' },
-  { id: 'PUBLISH-AND-OR', pattern: 'record.validated && record.exhibitName.trim().length > 0 && record.categoryId !== null', replacement: 'record.validated || record.exhibitName.trim().length > 0 && record.categoryId !== null', caseName: 'publish-needs-validation' },
+  { id: 'PRICE-INCLUSIVE-ZERO', pattern: 'price >= 0', replacement: 'price > 0' },
+  { id: 'YEAR-INCLUSIVE-LOWER', pattern: 'year >= 1800', replacement: 'year > 1800' },
+  { id: 'YEAR-INCLUSIVE-UPPER', pattern: 'year <= 2100', replacement: 'year < 2100' },
+  {
+    id: 'PUBLISH-AND-OR',
+    pattern: 'record.validated && record.exhibitName.trim().length > 0 && record.categoryId !== null',
+    replacement: 'record.validated || record.exhibitName.trim().length > 0 && record.categoryId !== null',
+  },
 ];
 
-function load(mutatedSource) {
-  const js = ts.transpileModule(mutatedSource, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
-  const exports = {};
-  vm.runInNewContext(js, { exports, Number });
-  return exports;
+const outcomes = [];
+try {
+  for (const operator of operators) {
+    if (!original.includes(operator.pattern)) {
+      throw new Error(`Mutation anchor missing: ${operator.id}`);
+    }
+    const mutated = original.replace(operator.pattern, operator.replacement);
+    fs.writeFileSync(sourcePath, mutated, 'utf8');
+    const result = spawnSync(
+      'pnpm --filter @museumos/api exec vitest run test/team/exhibit-workflow.test.ts test/team/exhibit-contracts.test.ts',
+      { encoding: 'utf8', shell: true },
+    );
+    const killed = result.status !== 0;
+    outcomes.push({
+      id: operator.id,
+      exitCode: result.status,
+      outcome: killed ? 'KILLED' : 'SURVIVED',
+    });
+  }
+} finally {
+  fs.writeFileSync(sourcePath, original, 'utf8');
 }
 
-const outcomes = operators.map((operator) => {
-  if (!original.includes(operator.pattern)) throw new Error(`Mutation anchor missing: ${operator.id}`);
-  const mutant = load(original.replace(operator.pattern, operator.replacement));
-  const test = cases.find((item) => item.name === operator.caseName);
-  const survived = mutant[test.fn](...test.args) === test.expected;
-  return { id: operator.id, test: test.name, outcome: survived ? 'SURVIVED' : 'KILLED' };
-});
-
+const killedCount = outcomes.filter((item) => item.outcome === 'KILLED').length;
 const report = {
+  capturedAt: new Date().toISOString(),
   source: sourcePath,
-  method: 'source-level domain mutation; each mutant compiled with TypeScript and checked against a named boundary oracle',
+  method: 'source-level domain mutation evaluated directly against the real Vitest team unit suite with guaranteed original-source restoration',
+  suiteCommand: 'pnpm --filter @museumos/api exec vitest run test/team/exhibit-workflow.test.ts test/team/exhibit-contracts.test.ts',
   customOperators: ['inclusive numeric boundary to exclusive', 'boolean conjunction to disjunction'],
   total: outcomes.length,
-  killed: outcomes.filter((item) => item.outcome === 'KILLED').length,
-  score: `${(100 * outcomes.filter((item) => item.outcome === 'KILLED').length / outcomes.length).toFixed(2)}%`,
+  killed: killedCount,
+  score: `${((100 * killedCount) / outcomes.length).toFixed(2)}%`,
   outcomes,
 };
 

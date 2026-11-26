@@ -23,7 +23,7 @@ def include(path: Path) -> bool:
     if rel.parts and rel.parts[0] == '.git' and '.git' not in rel.parts:
         return False
     name = path.name
-    if name == '.env' or (name.startswith('.env.') and name != '.env.example'):
+    if name == '.env' or (name.startswith('.env.') and not name.endswith('.example')):
         return False
     if path.is_symlink():
         return False

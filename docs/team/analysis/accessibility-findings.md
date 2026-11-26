@@ -1,35 +1,39 @@
-# Accessibility Findings - axe-core and Keyboard Evidence
+# Accessibility Findings — axe-core, Keyboard, and Multi-Screen Lighthouse
 
-Environment: Windows 11, Chromium headless shell 1248, local MuseumOS on port 5173; captured 2026-11-22. Evidence JSON is under `docs/team/evidence/accessibility/`.
+**Environment:** Windows 11, Chromium 1248, local MuseumOS on `http://127.0.0.1:5173`; live rerun captured 2026-11-26 (`docs/team/evidence/accessibility/`).
 
-| Screen | Before: violations | After: violations | After passes | Result |
+## 1. Automated axe-core & Keyboard Results (30/30 Playwright Run)
+
+| Screen | Baseline violations | Post-fix violations | Passing rules (after) | Result |
 |---|---:|---:|---:|---|
-| Create exhibit modal | 4 rules: button name, label, select name (critical), contrast (serious) | 0 | 45 | Fixed |
-| Exhibit detail | 2 rules: invalid description-list markup (serious), heading order (moderate) | 0 | 32 | Fixed |
-| Validated/published detail | 3 rules: toast/text contrast (serious), invalid description-list markup (serious), heading order (moderate) | 0 | 34 | Fixed |
+| Create exhibit modal (`/exhibits` → Add Exhibit) | 4 rules (button name, label, select name [critical], contrast [serious]) | **0** | 45 (`incomplete: 1`) | Fixed |
+| Exhibit detail (`/exhibits/:id` after creation) | 2 rules (invalid description-list markup [serious], heading order [moderate]) | **0** | 32 (`incomplete: 1`) | Fixed |
+| Validated & published detail | 3 rules (toast/text contrast [serious], invalid description-list markup [serious], heading order [moderate]) | **0** | 34 (`incomplete: 1`) | Fixed |
 
-## Lighthouse accessibility score
+- **Keyboard workflow proof (`UC-01-A2`):** Playwright verifies initial autofocus lands on `#new-exhibit-category`, blank whitespace input keeps `Create` disabled, `Tab` order reaches `Create`, and pressing `Enter` submits the new exhibit cleanly.
 
-| Capture | Source | Accessibility score | Failed audits |
-|---|---|---:|---|
-| Before | Pinned baseline `0ef7004ebef1c59130101fa0a56c95a50ca31900`, `/exhibits`, authenticated local Lighthouse run | 0.88 | `button-name`, `color-contrast` |
-| After | Final local code, same `/exhibits` route and runtime, authenticated Lighthouse run | 1.00 | None |
+## 2. Multi-Screen Authenticated Lighthouse Audit
 
-Raw Lighthouse JSON is `docs/team/evidence/accessibility/lighthouse-before-exhibits.json`, `lighthouse-after-exhibits.json`, `lighthouse-exhibits-list-full.json`, `lighthouse-exhibit-detail-full.json`, and `lighthouse-multi-screen.json`. Multi-screen authenticated Lighthouse runs (`scripts/team/run-lighthouse-audit.mjs`, captured 2026-11-23T20:21:41Z) scored both key workflow screens across all three required categories:
+Executed `scripts/team/run-lighthouse-audit.mjs` on 2026-11-26T10:27:14Z across all **three key workflow screens** (Catalogue list, Create Exhibit modal via `/exhibits?new=1`, and Exhibit Detail):
 
-| Screen | URL | Accessibility | Best Practices | SEO |
-|---|---|---:|---:|---:|
-| Exhibits list | `/exhibits` | **1.00** | **1.00** | **0.82** |
-| Exhibit detail | `/exhibits/:id` | **1.00** | **1.00** | **0.82** |
+| Screen | URL | Before A11y | After A11y | Best Practices | SEO | Raw Evidence |
+|---|---|---:|---:|---:|---:|---|
+| Exhibits catalogue | `/exhibits` | 0.88 | **1.00** | **1.00** | 0.82 | `lighthouse-exhibits-list-full.json` |
+| Create exhibit modal | `/exhibits?new=1` | — | **1.00** | **1.00** | 0.82 | `lighthouse-create-exhibit-modal-full.json` |
+| Exhibit detail | `/exhibits/:id` | — | **1.00** | **1.00** | 0.82 | `lighthouse-exhibit-detail-full.json` |
 
-All 8 Playwright E2E tests (including keyboard Tab/Enter submission on Create Exhibit and `0` axe-core violations across all 3 captured screens: `45`, `32`, and `34` passing rules) ran live on 2026-11-24 (`docs/team/evidence/e2e/playwright-report.html`).
+Consolidated JSON: `docs/team/evidence/accessibility/lighthouse-multi-screen.json`. Full 30-flow Playwright HTML report: `docs/team/evidence/e2e/playwright-report.html`.
 
-## Findings and changes
+## 3. Deduplicated Findings Inventory (Counted Once Across axe-core & Lighthouse)
 
-1. Icon-only close button and donor picker control had no accessible names; field labels were not associated with inputs, selects, and dynamic attributes. Added an explicit dialog name, close-button label, control IDs/`htmlFor`, and donor-button name.
-2. Primary blue text did not meet minimum contrast on light backgrounds. Darkened the theme primary color.
-3. Detail fields used `<dt>/<dd>` outside a `<dl>`; placed the content under description lists and made field wrappers layout-transparent.
-4. A section heading skipped heading level; changed it to the next level.
-5. Sonner success toast text was pale green on a pale green surface. Added a dark success text color.
+Each distinct UI accessibility issue below is counted **once** across both `axe-core` and Lighthouse (`A11Y-01`..`A11Y-05`):
 
-The Playwright W1 test verifies a keyboard user can tab to Create and submit with Enter. All three current axe scans record zero violations. Axe `incomplete` counts are non-violations and require manual review. The Lighthouse accessibility score improved from 0.88 to 1.00 on the catalogue screen.
+| ID | Screen(s) | Element / Selector | Detected By (Counted Once) | Severity | User Impact | Applied Fix & Verification |
+|---|---|---|---|---|---|---|
+| **A11Y-01** | Create modal | `NewExhibitModal` container, icon-only close `<button>`, `#new-exhibit-category`, `#new-exhibit-name`, `#new-exhibit-year`, dynamic attribute `<input>`/`<select>`, `DonorPicker` trigger | `axe-core` (`label`, `select-name`, `button-name`) + Lighthouse (`button-name`) | Critical | Screen readers could not announce field purpose, dialog title, or close action; keyboard users lacked associated focus labels. | Added `aria-labelledby="new-exhibit-title"`, `aria-label` on close & donor buttons, explicit `<label htmlFor>` + matching `id`s on `apps/web/src/pages/exhibits.tsx`. Verified: 0 violations (`45` passes), Lighthouse `1.00`. |
+| **A11Y-02** | Create modal, Catalogue, Detail | `.text-primary`, primary badge & accent links using CSS `--primary` token | `axe-core` (`color-contrast`) + Lighthouse (`color-contrast`) | Serious | Low-vision users struggled to distinguish primary links/actions against light card backgrounds (`< 4.5:1` ratio). | Darkened `--primary` HSL lightness in `apps/web/src/index.css` / `globals.css` to meet WCAG AA contrast (`>= 4.5:1`). Verified: 0 contrast violations across `axe-core` & all 3 Lighthouse captures (`1.00`). |
+| **A11Y-03** | Exhibit detail | Metadata rows using orphaned `<dt>` / `<dd>` inside `<div>` flex/grid containers (`exhibit-detail.tsx`) | `axe-core` (`definition-list`) | Serious | Assistive technologies misread field-value pairs outside a semantic `<dl>` container. | Wrapped metadata terms/definitions cleanly in semantic `<dl>` elements with layout-transparent wrappers (`display: contents` / semantic rows). Verified: 0 violations (`32` passes). |
+| **A11Y-04** | Exhibit detail | Section subheadings (`<h4>` directly beneath `<h1>` on `exhibit-detail.tsx`) | `axe-core` (`heading-order`) | Moderate | Screen-reader heading outline jumped levels, breaking document landmark navigation. | Adjusted section headings to `<h2>` beneath page `<h1>` (`Conservation log`, `Category attributes`). Verified: `heading-order` passes across detail & publish captures. |
+| **A11Y-05** | Detail (Publish toast) | `[data-sonner-toast][data-type="success"]` status banner | `axe-core` (`color-contrast`) | Serious | Pale green text on pale green background failed contrast (`< 4.5:1`) when announcing save/publish confirmation. | Configured high-contrast dark green text foreground on Sonner success toasts. Verified on live publish capture (`axe-after-publish-screen.json`, `34` passes, `0` violations). |
+
+Note: `incomplete: 1` reported by `axe-core` represents elements needing visual background-image verification rather than confirmed violations; SEO remains `0.82` because `<meta name="description">` and `robots.txt` are omitted intentionally for an internal museum intranet app (`robots` indexing not desired).

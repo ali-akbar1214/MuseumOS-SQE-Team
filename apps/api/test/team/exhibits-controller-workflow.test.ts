@@ -101,10 +101,25 @@ describe('ExhibitsService workflow methods', () => {
     expect(first.images[0]?.filename).toBe('front.jpg');
 
     const second = await service.create(
-      { categoryId, exhibitName: 'Amiga 500', acquiredAt: '2024-06-01T00:00:00.000Z', attributes: {} },
+      {
+        categoryId,
+        exhibitName: 'Amiga 500',
+        manufacturer: 'Commodore',
+        year: 1987,
+        donorId: '50000000-0000-4000-8000-000000000001',
+        locationId: '60000000-0000-4000-8000-000000000001',
+        locSite: 'Bay 2',
+        functional: true,
+        functionalComment: 'Working cleanly',
+        collectiblePrice: 350,
+        comment: 'Complete with box',
+        acquiredAt: '2024-06-01T00:00:00.000Z',
+        attributes: undefined as unknown as Record<string, unknown>,
+      },
       actorId,
     );
     expect(second.acquiredAt).toEqual(new Date('2024-06-01T00:00:00.000Z'));
+    expect(second.manufacturer).toBe('Commodore');
   });
 
   it('throws NotFoundException on missing exhibit and validates restore/softDelete', async () => {
@@ -218,6 +233,7 @@ describe('ExhibitsController W1/W2 workflow and authorization boundaries', () =>
       }),
       softDelete: vi.fn(async () => undefined),
       restore: vi.fn(async () => ({ ...row, deletedAt: null })),
+      findSimilar: vi.fn(async () => [{ id: exhibitId, relation: 'possible' }]),
     };
     const audit = {
       log: vi.fn(async () => undefined),
@@ -246,8 +262,24 @@ describe('ExhibitsController W1/W2 workflow and authorization boundaries', () =>
       makeReq('127.0.0.1', 'vitest'),
     );
     expect(created.exhibitName).toBe('Apple IIe');
+    expect(audit.log).toHaveBeenCalledWith({
+      entityType: 'exhibit',
+      entityId: exhibitId,
+      action: AuditAction.CREATE,
+      actorId,
+      diff: { displayId: [null, 'BK00001'], exhibitName: [null, 'Apple IIe'] },
+      ip: '127.0.0.1',
+      userAgent: 'vitest',
+    });
+
+    const createdNoHeaders = await controller.create(
+      { categoryId, exhibitName: 'Apple IIc' },
+      curator,
+      makeReq(),
+    );
+    expect(createdNoHeaders.exhibitName).toBe('Apple IIc');
     expect(audit.log).toHaveBeenCalledWith(
-      expect.objectContaining({ action: AuditAction.CREATE, actorId, ip: '127.0.0.1', userAgent: 'vitest' }),
+      expect.objectContaining({ action: AuditAction.CREATE, actorId, ip: null, userAgent: null }),
     );
   });
 
@@ -257,14 +289,38 @@ describe('ExhibitsController W1/W2 workflow and authorization boundaries', () =>
 
     await expect(
       controller.update(exhibitId, { validated: true }, curator, makeReq()),
-    ).rejects.toThrow(ForbiddenException);
+    ).rejects.toThrow('Missing permission: exhibit:validate');
     expect(service.update).not.toHaveBeenCalled();
 
-    const metaUpdated = await controller.update(exhibitId, { exhibitName: 'ZX Spectrum +2' }, curator, makeReq());
-    expect(metaUpdated.exhibitName).toBe('ZX Spectrum +2');
-    expect(audit.log).toHaveBeenCalledWith(expect.objectContaining({ action: AuditAction.UPDATE }));
+    // Passing categoryId together with validated when stored categoryId is null uses parsed.data.categoryId
+    const missingCatSetup = setupController(makeRawExhibit({ categoryId: null, validated: false, published: false }));
+    const filledCat = await missingCatSetup.controller.update(
+      exhibitId,
+      { categoryId, validated: true },
+      makeActor('admin', []),
+      makeReq(),
+    );
+    expect(filledCat.validated).toBe(true);
 
-    // Sending unchanged lifecycle flags alongside metadata also succeeds for curator
+    const metaUpdated = await controller.update(
+      exhibitId,
+      { exhibitName: 'ZX Spectrum +2' },
+      curator,
+      makeReq('10.0.0.2', 'curator-ua'),
+    );
+    expect(metaUpdated.exhibitName).toBe('ZX Spectrum +2');
+    expect(audit.log).toHaveBeenCalledWith(
+      expect.objectContaining({
+        entityType: 'exhibit',
+        entityId: exhibitId,
+        action: AuditAction.UPDATE,
+        actorId,
+        ip: '10.0.0.2',
+        userAgent: 'curator-ua',
+      }),
+    );
+
+    // Sending unchanged lifecycle flags alongside metadata also succeeds and preserves null headers when omitted
     const unchangedFlagsUpdate = await controller.update(
       exhibitId,
       { exhibitName: 'ZX Spectrum +3', validated: false, published: false },
@@ -272,6 +328,9 @@ describe('ExhibitsController W1/W2 workflow and authorization boundaries', () =>
       makeReq(),
     );
     expect(unchangedFlagsUpdate.exhibitName).toBe('ZX Spectrum +3');
+    expect(audit.log).toHaveBeenCalledWith(
+      expect.objectContaining({ action: AuditAction.UPDATE, ip: null, userAgent: null }),
+    );
   });
 
   it('allows admin and senior-curator with exhibit:validate, rejects invalid transitions, and audits delete/restore', async () => {
@@ -286,8 +345,13 @@ describe('ExhibitsController W1/W2 workflow and authorization boundaries', () =>
       'An exhibit must be validated before it can be published',
     );
 
-    // Senior curator validates, then admin publishes
-    const validated = await controller.update(exhibitId, { validated: true }, senior, makeReq());
+    // Senior curator validates with explicit name & category overrides, then admin publishes
+    const validated = await controller.update(
+      exhibitId,
+      { exhibitName: 'ZX Spectrum 128K', categoryId, validated: true },
+      senior,
+      makeReq('127.0.0.1', 'vitest'),
+    );
     expect(validated.validated).toBe(true);
 
     const published = await controller.update(exhibitId, { published: true }, admin, makeReq());
@@ -304,9 +368,22 @@ describe('ExhibitsController W1/W2 workflow and authorization boundaries', () =>
     expect(audit.log).toHaveBeenCalledTimes(callsBeforeNoop);
 
     expect((await controller.findById(exhibitId)).id).toBe(exhibitId);
+    expect((await controller.similar(exhibitId)).items).toHaveLength(1);
+    await controller.softDelete(exhibitId, admin, makeReq('127.0.0.1', 'vitest'));
     await controller.softDelete(exhibitId, admin, makeReq());
+    await controller.restore(exhibitId, admin, makeReq('127.0.0.1', 'vitest'));
     await controller.restore(exhibitId, admin, makeReq());
-    expect(audit.log).toHaveBeenCalledWith(expect.objectContaining({ action: AuditAction.DELETE }));
-    expect(audit.log).toHaveBeenCalledWith(expect.objectContaining({ action: AuditAction.RESTORE }));
+    expect(audit.log).toHaveBeenCalledWith(
+      expect.objectContaining({ entityType: 'exhibit', action: AuditAction.DELETE, ip: '127.0.0.1', userAgent: 'vitest' }),
+    );
+    expect(audit.log).toHaveBeenCalledWith(
+      expect.objectContaining({ entityType: 'exhibit', action: AuditAction.DELETE, ip: null, userAgent: null }),
+    );
+    expect(audit.log).toHaveBeenCalledWith(
+      expect.objectContaining({ entityType: 'exhibit', action: AuditAction.RESTORE, ip: '127.0.0.1', userAgent: 'vitest' }),
+    );
+    expect(audit.log).toHaveBeenCalledWith(
+      expect.objectContaining({ entityType: 'exhibit', action: AuditAction.RESTORE, ip: null, userAgent: null }),
+    );
   });
 });

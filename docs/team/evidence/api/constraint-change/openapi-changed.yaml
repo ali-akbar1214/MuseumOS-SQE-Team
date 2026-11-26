@@ -1,11 +1,100 @@
 openapi: 3.0.3
 info:
   title: MuseumOS Team Exhibit API
-  version: 1.0.0
+  version: 1.1.0
 servers:
   - url: http://localhost:3000/api
 paths:
+  /health:
+    get:
+      summary: API health probe
+      responses:
+        "200":
+          description: Healthy service
+  /auth/login:
+    post:
+      summary: Authenticate session cookie
+      responses:
+        "200":
+          description: Authenticated session
+        "401":
+          description: Invalid credentials
+  /auth/me:
+    get:
+      summary: Current authenticated user
+      responses:
+        "200":
+          description: Current user snapshot
+        "401":
+          description: Unauthenticated
+  /categories:
+    get:
+      summary: List exhibit categories
+      responses:
+        "200":
+          description: Categories array
+        "401":
+          description: Unauthenticated
   /exhibits:
+    get:
+      summary: Search and filter exhibits
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: string
+        - name: categoryId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: yearFrom
+          in: query
+          schema:
+            type: integer
+            minimum: 1800
+            maximum: 2100
+        - name: yearTo
+          in: query
+          schema:
+            type: integer
+            minimum: 1800
+            maximum: 2100
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+            enum:
+              - displayId
+              - exhibitName
+              - manufacturer
+              - year
+              - createdAt
+        - name: sortOrder
+          in: query
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+      responses:
+        "200":
+          description: Paginated exhibits
+        "400":
+          description: Invalid query parameter
+        "401":
+          description: Unauthenticated
     post:
       summary: Create exhibit
       requestBody:
@@ -19,16 +108,24 @@ paths:
           description: Exhibit created
         "400":
           description: Invalid input
+        "401":
+          description: Unauthenticated
+        "403":
+          description: Missing permission exhibit:write
   /exhibits/{id}:
     get:
+      summary: Read exhibit by UUID
       parameters:
         - $ref: "#/components/parameters/ExhibitId"
       responses:
         "200":
           description: Exhibit
+        "401":
+          description: Unauthenticated
         "404":
           description: Not found
     patch:
+      summary: Update exhibit metadata or lifecycle state
       parameters:
         - $ref: "#/components/parameters/ExhibitId"
       requestBody:
@@ -42,6 +139,25 @@ paths:
           description: Exhibit updated
         "400":
           description: Invalid transition or input
+        "401":
+          description: Unauthenticated
+        "403":
+          description: Missing permission exhibit:write or exhibit:validate
+        "404":
+          description: Not found
+    delete:
+      summary: Soft-delete exhibit
+      parameters:
+        - $ref: "#/components/parameters/ExhibitId"
+      responses:
+        "204":
+          description: Soft-deleted
+        "401":
+          description: Unauthenticated
+        "403":
+          description: Missing permission exhibit:delete
+        "404":
+          description: Not found
 components:
   parameters:
     ExhibitId:
@@ -71,7 +187,7 @@ components:
           maximum: 2090
           nullable: true
         collectiblePrice:
-          type: number
+          type: integer
           minimum: 0
           nullable: true
     UpdateExhibit:
@@ -94,3 +210,16 @@ components:
           type: boolean
         published:
           type: boolean
+    SearchExhibitsQuery:
+      type: object
+      properties:
+        sortOrder:
+          type: string
+          enum:
+            - asc
+            - desc
+            - relevance
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100

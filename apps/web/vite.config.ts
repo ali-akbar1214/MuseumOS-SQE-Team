@@ -23,4 +23,18 @@ export default defineConfig({
       },
     },
   },
+  preview: {
+    port: 4173,
+    allowedHosts: ['localhost', '127.0.0.1', 'host.docker.internal'],
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+      '/img': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+    },
+  },
 });

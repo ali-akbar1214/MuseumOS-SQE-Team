@@ -5,22 +5,26 @@
 Routes and data in scope for W1 (exhibit catalogue creation) and W2 (validation and publication):
 - `GET /api/exhibits`, `GET /api/exhibits/:id` — protected by `AuthGuard` + `@RequirePermission('exhibit:read')`.
 - `POST /api/exhibits` — protected by `AuthGuard` + `@RequirePermission('exhibit:write')` + Zod `createExhibitSchema`.
-- `PATCH /api/exhibits/:id` — protected by `AuthGuard` + `@RequirePermission('exhibit:write')` + inline lifecycle check (`exhibit:validate` or `admin` required whenever `validated` or `published` is present).
+- `PATCH /api/exhibits/:id` — protected by `AuthGuard` + `@RequirePermission('exhibit:write')` + inline lifecycle check (`exhibit:validate` or `admin` required whenever `validated` or `published` actually changes relative to stored state).
 - `DELETE /api/exhibits/:id` — protected by `AuthGuard` + `@RequirePermission('exhibit:delete')`.
 
-The Playwright RBAC suite (`tests/team/uc03-uc04-access-search.spec.ts`) executes automated allow/deny checks across viewer, curator, and administrator accounts and writes `docs/team/evidence/security/access-checks.json`:
+The split Playwright RBAC suite (`tests/team/uc03-uc04-access-search.spec.ts`) executes **11 live allow/deny checks** across unauthenticated requests, viewer, curator, and administrator accounts, and **reads back target records after every `401`/`403`** to verify zero state mutation (`docs/team/evidence/security/access-checks.json`, captured 2026-11-26T10:29:07Z):
 
-| Role | Action | Endpoint | Expected | Observed (`access-checks.json` / UC-03) |
-|---|---|---|---:|---|
-| Viewer | Read exhibit catalogue | `GET /api/exhibits` | 200 | 200 Allowed |
-| Viewer | Create exhibit | `POST /api/exhibits` | 403 | 403 Denied (`Missing permission: exhibit:write`) |
-| Curator | Read exhibit catalogue | `GET /api/exhibits` | 200 | 200 Allowed |
-| Curator | Create exhibit | `POST /api/exhibits` | 201 | 201 Allowed |
-| Curator | Validate exhibit (`DEF-003` fix) | `PATCH /api/exhibits/:id` | 403 | 403 Denied (`Missing permission: exhibit:validate`) |
-| Curator | Publish exhibit | `PATCH /api/exhibits/:id` | 403 | 403 Denied (`Missing permission: exhibit:validate`) |
-| Administrator | Validate & publish exhibit | `PATCH /api/exhibits/:id` | 200 | 200 Allowed (W2 workflow) |
+| Role | Action | Endpoint | Expected | Observed (`access-checks.json`) | Read-Back Proof (`statePreserved`) |
+|---|---|---|---:|---|---|
+| Unauthenticated | Redirect browser `/exhibits` → `/login` & read API | `GET /api/exhibits` | 401 | **401 Denied** (+ UI redirect) | Yes (`true`) |
+| Unauthenticated | Create exhibit | `POST /api/exhibits` | 401 | **401 Denied** | Yes (`true`) |
+| Unauthenticated | Validate exhibit | `PATCH /api/exhibits/:id` | 401 | **401 Denied** | Yes (`validated=false`) |
+| Viewer | Read exhibit catalogue (with UI role badge check) | `GET /api/exhibits` | 200 | **200 Allowed** | Yes (`true`) |
+| Viewer | Create exhibit (API + UI modal submission check) | `POST /api/exhibits` | 403 | **403 Denied** + UI `.text-destructive` | Yes (0 matching rows in search) |
+| Viewer | Validate exhibit | `PATCH /api/exhibits/:id` | 403 | **403 Denied** | Yes (`validated=false, published=false`) |
+| Curator | Read exhibit catalogue | `GET /api/exhibits` | 200 | **200 Allowed** | Yes (`true`) |
+| Curator | Create draft exhibit | `POST /api/exhibits` | 201 | **201 Allowed** | Yes (`true`) |
+| Curator | Validate exhibit (`DEF-003` fix) | `PATCH /api/exhibits/:id` | 403 | **403 Denied** | Yes (`validated=false, published=false`) |
+| Curator | Publish exhibit | `PATCH /api/exhibits/:id` | 403 | **403 Denied** | Yes (`validated=false, published=false`) |
+| Administrator | Validate exhibit (UI + API) | `PATCH /api/exhibits/:id` | 200 | **200 Allowed** | Yes (`validated=true`) |
 
-Live cookie inspection (`docs/team/evidence/security/cookie-security-check.json`, captured 2026-11-23T20:19:07Z) verified `museumos.sid` has `httpOnly: true`, `sameSite: "Lax"`, `path: "/"`, and `secure: false` on local HTTP.
+Live cookie inspection (`docs/team/evidence/security/cookie-security-check.json`, captured 2026-11-26T10:28:59Z) verified `museumos.sid` has `httpOnly: true`, `sameSite: "Lax"`, `path: "/"`, and `secure: false` on local HTTP.
 
 ---
 
@@ -28,43 +32,39 @@ Live cookie inspection (`docs/team/evidence/security/cookie-security-check.json`
 
 1. **Session Cookie Attributes & Fixation Protection** (`apps/api/src/main.ts` lines 68–94; `apps/api/src/auth/auth.controller.ts` lines 34–66):
    - Sessions are persisted server-side in PostgreSQL via `connect-pg-simple` (`http_sessions` table), cookie name `museumos.sid`, `resave: false`, `saveUninitialized: false`, `maxAge: 7d`.
-   - `httpOnly: true` prevents client-side `document.cookie` exfiltration via XSS.
-   - `sameSite: 'lax'` mitigates cross-site state-changing CSRF on `POST`/`PATCH`/`DELETE`.
-   - `req.session.regenerate(...)` executes inside `AuthController.login` prior to attaching `userId` and `permissions`, preventing session-fixation attacks.
-   - Login endpoint applies `@Throttle({ login: { ttl: 15 * 60 * 1000, limit: 10 } })` against brute-force/credential stuffing.
-   - **Finding / Observation (`SEC-001`, linked to Risk P2):** `cookie.secure` is gated on `NODE_ENV === 'production' && SESSION_COOKIE_SECURE !== 'false'`. On local HTTP (`http://localhost:3000`), `Secure` is `false` (expected for plain HTTP dev), **but** deployments setting `SESSION_COOKIE_SECURE=false` risk cleartext cookie transmission if TLS termination is misconfigured. Recommendation: enforce `Secure=true` in production behind TLS and remove the disable flag in production profiles.
-
-2. **Two-Layer RBAC & Privilege-Escalation Prevention** (`apps/api/src/auth/guards/permission.guard.ts`; `apps/api/src/exhibits/exhibits.controller.ts` lines 234–237):
-   - Route-level `@RequirePermission(...)` enforces coarse permissions (`exhibit:read`, `exhibit:write`, `exhibit:delete`).
-   - Because `PATCH /api/exhibits/:id` handles both metadata edits and lifecycle transitions, `ExhibitsController.update` explicitly verifies `actor.role === 'admin' || actor.permissions.includes('exhibit:validate')` before permitting `validated` or `published` changes (`DEF-003` remediation).
-
+   - `httpOnly: true` prevents `document.cookie` theft via XSS; `sameSite: 'lax'` mitigates cross-site CSRF on state-changing requests.
+   - `req.session.regenerate(...)` runs on login prior to binding `userId` and `permissions`; `@Throttle({ login: { ttl: 15 * 60 * 1000, limit: 10 } })` caps credential-stuffing attempts.
+   - **Finding `SEC-001` (linked to Risk P2):** `cookie.secure` is `false` on plain local HTTP (`http://127.0.0.1:3000`) and gated on `NODE_ENV === 'production' && SESSION_COOKIE_SECURE !== 'false'`. Production deployments must enforce `Secure=true` behind TLS and disallow overriding it to `false`.
+2. **Two-Layer RBAC & Privilege-Escalation Prevention** (`apps/api/src/auth/guards/permission.guard.ts`; `apps/api/src/exhibits/exhibits.controller.ts` lines 234–246):
+   - Route-level `@RequirePermission(...)` enforces base permissions (`exhibit:read`, `exhibit:write`, `exhibit:delete`), and `ExhibitsController.update` verifies `actor.role === 'admin' || actor.permissions.includes('exhibit:validate')` whenever `validated` or `published` changes (`DEF-003` fix), while permitting curator metadata-only edits (`UC-05`).
 3. **HTTP Security Headers & CORS Allowlist** (`apps/api/src/main.ts` lines 53–57, 96–99):
-   - `helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } })` applies `X-Content-Type-Options: nosniff`, `X-Frame-Options`, and baseline hardening headers.
-   - `enableCors` restricts `credentials: true` to `CORS_ORIGINS` (defaulting only to `http://localhost:5173`).
+   - `helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } })` applies `X-Content-Type-Options: nosniff`, `X-Frame-Options`, and baseline hardening headers on all NestJS API responses.
 
 ---
 
-## 3. SonarQube Hotspots & Static Posture
+## 3. OWASP ZAP Passive Scan (Production Preview `:4173` + Direct API `:3000`)
 
-SonarQube 9.9.8 Community Build identified three hotspots; all were reviewed and marked Safe (`evidence/sonar-final-hotspots.json`):
-- Trailing-slash regex in `branding.ts` (linear non-nested pattern on static environment config).
-- Dashboard decorative quote selection via `Math.random()` in `dashboard.tsx` (non-security UI display).
-- 404 cosmetic error-code display via `Math.random()` (non-security display).
+Executed `scripts/team/run-zap-passive.ps1` using `ghcr.io/zaproxy/zaproxy:stable` on 2026-11-26 (`docs/team/evidence/security/zap-passive-report.{html,json}`). The scan proxied **both**:
+1. All **30/30 Playwright E2E flows** against the compiled **Vite production preview bundle** (`vite preview --port 4173` at `http://host.docker.internal:4173`, eliminating Vite HMR dev-server artifacts), and
+2. Direct API probes (`GET /api/health`, `GET /api/exhibits` unauthenticated `401`, `POST /api/auth/login`, `GET /api/auth/me`, `GET /api/categories`, `GET /api/exhibits?limit=5`) directly against the NestJS API host (`http://host.docker.internal:3000/api`).
 
-Final SonarQube scan reports **0 bugs, 0 vulnerabilities, 0 open hotspots**, and **OK** quality gate.
+**Measured ZAP Passive Findings:** **104 alert instances** across **0 High**, **3 Medium**, **1 Low**, and **3 Informational** rules:
+- **Direct API (`host.docker.internal:3000`):** Returned **0 Medium / 0 Low header warnings** (`2x` `Informational` `Session Management Response Identified` `10112` confirming cookie session flow), proving `helmet` headers actively protect the API origin. (Note: `helmet` emits default headers over HTTP; TLS/HSTS transport security is out of scope on local HTTP and relies on reverse-proxy TLS in production.)
+- **Production Web Preview (`host.docker.internal:4173`):** Because `vite preview` serves static `dist/` HTML without a production reverse proxy (`nginx`/`caddy`), the frontend host recorded:
+
+| Risk | Instances | Alert (Plugin / CWE) | Affected Host & Path | Impact & Corrective Control |
+|---|---:|---|---|---|
+| **Medium** | 14 | Content Security Policy (CSP) Header Not Set (`10038` / CWE-693) | `host.docker.internal:4173` SPA HTML | Serve built `dist/` behind nginx/Caddy with strict `Content-Security-Policy` (`default-src 'self'`). |
+| **Medium** | 14 | Missing Anti-clickjacking Header (`10020` / CWE-1021) | `host.docker.internal:4173` SPA HTML | Emit `X-Frame-Options: DENY` and `frame-ancestors 'none'` at the web reverse proxy. |
+| **Medium** | 14 | Sub Resource Integrity (SRI) Missing (`90003` / CWE-345) | `host.docker.internal:4173` external Google Fonts link | Self-host WOFF2 fonts inside `apps/web/public/` or pin static stylesheet `integrity` hashes. |
+| **Low** | 16 | `X-Content-Type-Options` Header Missing (`10021` / CWE-693) | `host.docker.internal:4173` static preview assets | Configure `X-Content-Type-Options: nosniff` on the static web gateway (already enforced on API `:3000`). |
+| **Info** | 44 | Suspicious Comments (`10027`, 28x), Modern Web App (`10109`, 14x), Session Mgmt (`10112`, 2x) | `:4173` & `:3000` | Reviewed benign React/bundle comments and expected SPA/cookie identification. |
+
+**Scan Boundary Statement:** ZAP was run strictly in **passive** proxy mode over local HTTP (`http://host.docker.internal:4173` + `:3000`). Active fuzzing (`zap-full-scan`), TLS/HSTS certificate checks, and reverse-proxy header enforcement require staging HTTPS deployment and were not claimed.
 
 ---
 
-## 4. Production Dependency Audit (`pnpm audit --prod`) & OWASP ZAP Passive Scan
+## 4. Production Dependency Audit (`pnpm audit --prod`) & SonarQube Hotspots
 
-- `pnpm audit --prod` snapshot (`docs/team/evidence/security/dependency-audit.json`) found **26 advisories**: **1 critical, 14 high, 8 moderate, 3 low**. Full per-package reachability, workflow impact, and remediation plan are documented in `docs/team/analysis/dependency-triage.md` and `docs/team/evidence/security/dependency-triage.csv`.
-- **OWASP ZAP Passive Scan (`docs/team/evidence/security/zap-passive-report.{html,json}`):** Executed `scripts/team/run-zap-passive.ps1` using `ghcr.io/zaproxy/zaproxy:stable` as a passive HTTP proxy on port `8080` while Playwright ran all 8 tests (`UC-01`–`UC-06`, all 8 passed). ZAP recorded **9 unique alert types across 153 instances** (`0 High`, `3 Medium`, `2 Low`, `4 Informational`):
-
-| Risk | Alert (Plugin / CWE) | Affected Component / Evidence | Likely Impact & Recommended Correction |
-|---|---|---|---|
-| **Medium** | Content Security Policy (CSP) Header Not Set (`10038` / CWE-693) | Web UI HTML responses (`8` URLs via Vite `5173`) | Weakens defense-in-depth against script injection. Configure a strict `Content-Security-Policy` header at the production reverse proxy / `helmet` HTML gateway. |
-| **Medium** | Missing Anti-clickjacking Header (`10020` / CWE-1021) | Web UI responses (`8` URLs on Vite `5173`; API applies `helmet` `X-Frame-Options`) | Allows UI framing if reverse proxy omits headers. Emit `X-Frame-Options: DENY` (or CSP `frame-ancestors 'none'`) on frontend HTTP responses. |
-| **Medium** | Sub Resource Integrity (SRI) Attribute Missing (`90003` / CWE-345) | External Google Fonts `<link rel="stylesheet">` in `index.html` (`8` URLs) | External CDN compromise could alter loaded styles. Self-host typography assets or pin fixed assets with `integrity` hashes. |
-| **Low** | X-Content-Type-Options Header Missing (`10021` / CWE-693) | Vite dev server JS/TSX module assets (`77` URLs; API applies `nosniff` via `helmet`) | Browser MIME-sniffing risk on static dev assets. Ensure production static server / nginx sets `X-Content-Type-Options: nosniff`. |
-| **Low** | Timestamp Disclosure - Unix (`10096` / CWE-497) | Bundled `react-dom_client.js` literal `2080374784` (`1` URL) | Benign numeric constant in third-party React bundle; confirm non-sensitive (no secret leakage). |
-| **Info** | `museumos.sid` Session Management Response Identified (`10112`), Dev HMR Token URL (`10024` Vite-only), HTML Comment (`10027`), Modern Web App (`10109`) | Login response & Vite dev shell (`29` instances total) | Confirms `museumos.sid` session cookie flow works as designed; Vite dev HMR token (`/?token=...`) is dev-only and absent from production bundles. |
+- `pnpm audit --prod` snapshot (`docs/team/evidence/security/dependency-audit.json`) recorded **26 advisories**: **1 Critical, 14 High, 8 Moderate, 3 Low**, each mapped with exact installed versions from `node_modules/.pnpm`, reachability analysis, and upgrade decisions in `docs/team/analysis/dependency-triage.md` (tracked under Risk `SEC-DEP-01` / P2).
+- SonarQube Community Build 9.9.8 flagged 3 baseline hotspots (`branding.ts` regex and 2 decorative `Math.random()` calls), all reviewed Safe (`0` open hotspots).

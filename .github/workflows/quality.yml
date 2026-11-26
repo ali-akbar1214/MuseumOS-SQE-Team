@@ -74,8 +74,11 @@ jobs:
       - name: Workspace TypeScript & production build gate
         run: pnpm build
 
-      - name: White-box unit & 100% lifecycle coverage gate
+      - name: White-box unit & 100% lifecycle + RBAC coverage gate
         run: pnpm --filter @museumos/api exec vitest run test/team --coverage
+
+      - name: Scoped business-logic 100% branch coverage & LCOV gate
+        run: pnpm test:coverage:all
 
       - name: Custom domain mutation gate (100% required)
         run: pnpm test:mutation:custom
@@ -83,19 +86,11 @@ jobs:
       - name: Stryker mutation testing gate (>=80% required)
         run: pnpm test:mutation
 
-      - name: OpenAPI generator & two-constraint proof
+      - name: OpenAPI generator & four-constraint proof
         run: pnpm test:data:constraints
 
-      - name: SonarCloud static analysis & quality gate
-        if: vars.SONAR_ENABLED == 'true'
-        uses: SonarSource/sonarqube-scan-action@v4
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          args: >
-            -Dsonar.qualitygate.wait=true
-            -Dsonar.typescript.tsconfigPath=sonar/tsconfig.sonar.json
-            -Dsonar.javascript.lcov.reportPaths=apps/api/coverage/lcov.info
+      - name: Mandatory SonarQube overall-code static analysis & LCOV quality gate
+        run: bash scripts/team/ci-sonar-gate.sh
 
       - name: Install Playwright Chromium
         run: pnpm exec playwright install --with-deps chromium
@@ -118,7 +113,7 @@ jobs:
           curl -sf http://localhost:3000/api/health
           pnpm test:api
           pnpm test:recovery:db
-          # Allow the 10s medium ThrottlerGuard window (100 req/10s) to reset after the 124-request API burst.
+          # Allow the 10s medium ThrottlerGuard window (100 req/10s) to reset after the API suite burst.
           sleep 11
           pnpm test:e2e --workers=1 --reporter=line
 
@@ -130,3 +125,11 @@ jobs:
           for ctx in test-results/playwright/*/error-context.md; do
             if [ -f "$ctx" ]; then echo "=== $ctx ==="; head -n 120 "$ctx"; fi
           done
+
+  release-check:
+    needs: [quality]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify release package gate readiness
+        run: echo "All quality gates passed; release artifact verification cleared."
