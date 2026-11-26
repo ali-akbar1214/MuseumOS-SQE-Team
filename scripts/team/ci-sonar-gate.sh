@@ -121,6 +121,13 @@ echo "=== Final SonarQube Quality Gate Status ==="
 echo "$STATUS_JSON"
 curl -sf -u admin:admin "http://127.0.0.1:9001/api/measures/component?component=MuseumOS-SQE-final&metricKeys=bugs,vulnerabilities,code_smells,reliability_rating,security_rating,sqale_rating,duplicated_lines_density,security_hotspots,security_hotspots_reviewed"
 echo ""
+echo "=== SonarQube BUG Issues ==="
+curl -sf -u admin:admin "http://127.0.0.1:9001/api/issues/search?componentKeys=MuseumOS-SQE-final&types=BUG&ps=50" | node -e "
+const d = JSON.parse(require('fs').readFileSync(0,'utf8'));
+for (const i of (d.issues || [])) {
+  console.log(i.component + ':' + (i.line || 0) + ' [' + i.rule + '] ' + i.message);
+}
+"
 
 if [ "$SCAN_RC" -ne 0 ]; then
   exit "$SCAN_RC"
