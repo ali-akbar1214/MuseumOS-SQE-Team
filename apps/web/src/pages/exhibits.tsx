@@ -1204,7 +1204,7 @@ export function ExhibitsPage() {
                       )}
                       <div className="mt-auto flex items-center gap-1.5 pt-1.5 text-[11px] text-muted-foreground">
                         <span className="rounded bg-muted px-1.5 py-0.5">{lang === 'el' ? ex.category.nameEl : ex.category.nameEn}</span>
-                        {ex.year && <span>· {ex.year}</span>}
+                        {Boolean(ex.year) && <span>· {ex.year}</span>}
                       </div>
                     </div>
                   ) : (
