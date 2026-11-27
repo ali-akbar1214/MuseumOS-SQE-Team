@@ -215,7 +215,7 @@ export function DonorDetailPage() {
                     <p className="truncate text-xs text-muted-foreground">
                       {isEl ? ex.category.nameEl : ex.category.nameEn}
                       {ex.manufacturer && ` · ${ex.manufacturer}`}
-                      {ex.year && ` · ${ex.year}`}
+                      {Boolean(ex.year) && ` · ${ex.year}`}
                     </p>
                   </div>
                   <div className="flex-shrink-0 text-right text-xs text-muted-foreground">

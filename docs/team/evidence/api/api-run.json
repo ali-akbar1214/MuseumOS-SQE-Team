@@ -1,7 +1,8 @@
 {
+  "capturedAt": "2026-11-26T19:35:14.550Z",
   "baseline": {
     "commit": "0ef7004ebef1c59130101fa0a56c95a50ca31900",
-    "runId": "SQE-1795464551761"
+    "runId": "SQE-1795721698365"
   },
   "setup": {
     "login": 200,
@@ -10,26 +11,413 @@
     "unauthenticatedRead": 401,
     "viewerAccess": {
       "login": 200,
-      "create": 403
+      "create": 403,
+      "patch": 403,
+      "delete": 403
     }
   },
   "created": {
     "status": 201,
-    "id": "c31b2129-9153-4daf-a7bd-632390118994",
-    "displayId": "BK00015"
+    "id": "76fbba86-cf26-43ca-ace7-daa6bc3a73bd",
+    "displayId": "BK00140"
   },
+  "coverageMatrix": [
+    {
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "statusesTested": [
+        200,
+        401
+      ],
+      "parametersTested": [
+        "identifier/password"
+      ],
+      "executedCases": 2
+    },
+    {
+      "method": "GET",
+      "endpoint": "/auth/me",
+      "statusesTested": [
+        200,
+        401
+      ],
+      "parametersTested": [],
+      "executedCases": 2
+    },
+    {
+      "method": "GET",
+      "endpoint": "/categories",
+      "statusesTested": [
+        200,
+        401
+      ],
+      "parametersTested": [],
+      "executedCases": 2
+    },
+    {
+      "method": "GET",
+      "endpoint": "/exhibits",
+      "statusesTested": [
+        200,
+        400,
+        401
+      ],
+      "parametersTested": [
+        "limit",
+        "sortOrder",
+        "yearFrom"
+      ],
+      "executedCases": 15
+    },
+    {
+      "method": "POST",
+      "endpoint": "/exhibits",
+      "statusesTested": [
+        201,
+        400,
+        401,
+        403
+      ],
+      "parametersTested": [
+        "categoryId",
+        "collectiblePrice",
+        "exhibitName",
+        "role",
+        "year"
+      ],
+      "executedCases": 31
+    },
+    {
+      "method": "GET",
+      "endpoint": "/health",
+      "statusesTested": [
+        200
+      ],
+      "parametersTested": [],
+      "executedCases": 1
+    },
+    {
+      "method": "GET",
+      "endpoint": "/exhibits/{id}",
+      "statusesTested": [
+        200,
+        401,
+        404
+      ],
+      "parametersTested": [
+        "id"
+      ],
+      "executedCases": 3
+    },
+    {
+      "method": "PATCH",
+      "endpoint": "/exhibits/{id}",
+      "statusesTested": [
+        200,
+        400,
+        401,
+        403,
+        404
+      ],
+      "parametersTested": [
+        "categoryId",
+        "collectiblePrice",
+        "exhibitName",
+        "id",
+        "published",
+        "role",
+        "validated",
+        "validated/published",
+        "year"
+      ],
+      "executedCases": 33
+    },
+    {
+      "method": "DELETE",
+      "endpoint": "/exhibits/{id}",
+      "statusesTested": [
+        204,
+        401,
+        403,
+        404
+      ],
+      "parametersTested": [
+        "id",
+        "role"
+      ],
+      "executedCases": 4
+    }
+  ],
   "generatedCases": {
     "source": "docs\\team\\planning\\openapi.yaml",
-    "total": 62,
+    "total": 93,
     "outcomes": [
       {
+        "operation": "POST",
+        "endpoint": "/auth/login",
+        "caseId": "API-AUTH-LOGIN-401",
+        "field": "identifier/password",
+        "expected": 401,
+        "observed": 401
+      },
+      {
         "operation": "GET",
-        "caseId": "API-AUTH-401",
+        "endpoint": "/auth/me",
+        "caseId": "API-AUTH-ME-401",
+        "expected": 401,
+        "observed": 401
+      },
+      {
+        "operation": "GET",
+        "endpoint": "/categories",
+        "caseId": "API-CATEGORIES-401",
+        "expected": 401,
+        "observed": 401
+      },
+      {
+        "operation": "GET",
+        "endpoint": "/exhibits",
+        "caseId": "API-EXHIBITS-LIST-401",
         "expected": 401,
         "observed": 401
       },
       {
         "operation": "POST",
+        "endpoint": "/exhibits",
+        "caseId": "API-EXHIBITS-CREATE-401",
+        "expected": 401,
+        "observed": 401
+      },
+      {
+        "operation": "POST",
+        "endpoint": "/auth/login",
+        "caseId": "API-AUTH-LOGIN-200",
+        "field": "identifier/password",
+        "expected": 200,
+        "observed": 200
+      },
+      {
+        "operation": "GET",
+        "endpoint": "/health",
+        "caseId": "API-HEALTH-200",
+        "expected": 200,
+        "observed": 200
+      },
+      {
+        "operation": "GET",
+        "endpoint": "/auth/me",
+        "caseId": "API-AUTH-ME-200",
+        "expected": 200,
+        "observed": 200
+      },
+      {
+        "operation": "GET",
+        "endpoint": "/categories",
+        "caseId": "API-CATEGORIES-200",
+        "expected": 200,
+        "observed": 200
+      },
+      {
+        "operation": "GET",
+        "endpoint": "/exhibits",
+        "caseId": "API-GET-SORTORDER-asc",
+        "field": "sortOrder",
+        "partitions": [
+          "valid-enum-asc"
+        ],
+        "techniques": [
+          "EP"
+        ],
+        "expected": 200,
+        "observed": 200
+      },
+      {
+        "operation": "GET",
+        "endpoint": "/exhibits",
+        "caseId": "API-GET-SORTORDER-desc",
+        "field": "sortOrder",
+        "partitions": [
+          "valid-enum-desc"
+        ],
+        "techniques": [
+          "EP"
+        ],
+        "expected": 200,
+        "observed": 200
+      },
+      {
+        "operation": "GET",
+        "endpoint": "/exhibits",
+        "caseId": "API-GET-SORTORDER-__invalid_enum__",
+        "field": "sortOrder",
+        "partitions": [
+          "invalid-enum"
+        ],
+        "techniques": [
+          "EP"
+        ],
+        "expected": 400,
+        "observed": 400
+      },
+      {
+        "operation": "GET",
+        "endpoint": "/exhibits",
+        "caseId": "API-GET-SORTORDER-42",
+        "field": "sortOrder",
+        "partitions": [
+          "wrong-type-number"
+        ],
+        "techniques": [
+          "EP"
+        ],
+        "expected": 400,
+        "observed": 400
+      },
+      {
+        "operation": "GET",
+        "endpoint": "/exhibits",
+        "caseId": "API-GET-LIMIT-0",
+        "field": "limit",
+        "partitions": [
+          "invalid-below-minimum",
+          "value-0"
+        ],
+        "techniques": [
+          "EP",
+          "3-point BVA"
+        ],
+        "expected": 400,
+        "observed": 400
+      },
+      {
+        "operation": "GET",
+        "endpoint": "/exhibits",
+        "caseId": "API-GET-LIMIT-1",
+        "field": "limit",
+        "partitions": [
+          "valid-lower-boundary",
+          "value-1"
+        ],
+        "techniques": [
+          "EP",
+          "3-point BVA"
+        ],
+        "expected": 200,
+        "observed": 200
+      },
+      {
+        "operation": "GET",
+        "endpoint": "/exhibits",
+        "caseId": "API-GET-LIMIT-50",
+        "field": "limit",
+        "partitions": [
+          "valid-middle"
+        ],
+        "techniques": [
+          "EP"
+        ],
+        "expected": 200,
+        "observed": 200
+      },
+      {
+        "operation": "GET",
+        "endpoint": "/exhibits",
+        "caseId": "API-GET-LIMIT-100",
+        "field": "limit",
+        "partitions": [
+          "valid-upper-boundary",
+          "value-100"
+        ],
+        "techniques": [
+          "EP",
+          "3-point BVA"
+        ],
+        "expected": 200,
+        "observed": 200
+      },
+      {
+        "operation": "GET",
+        "endpoint": "/exhibits",
+        "caseId": "API-GET-LIMIT-101",
+        "field": "limit",
+        "partitions": [
+          "invalid-above-maximum",
+          "value-101"
+        ],
+        "techniques": [
+          "EP",
+          "3-point BVA"
+        ],
+        "expected": 400,
+        "observed": 400
+      },
+      {
+        "operation": "GET",
+        "endpoint": "/exhibits",
+        "caseId": "API-GET-LIMIT-2",
+        "field": "limit",
+        "partitions": [
+          "value-2"
+        ],
+        "techniques": [
+          "3-point BVA"
+        ],
+        "expected": 200,
+        "observed": 200
+      },
+      {
+        "operation": "GET",
+        "endpoint": "/exhibits",
+        "caseId": "API-GET-LIMIT-99",
+        "field": "limit",
+        "partitions": [
+          "value-99"
+        ],
+        "techniques": [
+          "3-point BVA"
+        ],
+        "expected": 200,
+        "observed": 200
+      },
+      {
+        "operation": "GET",
+        "endpoint": "/exhibits",
+        "caseId": "API-GET-LIMIT-1.5",
+        "field": "limit",
+        "partitions": [
+          "invalid-non-integer"
+        ],
+        "techniques": [
+          "EP"
+        ],
+        "expected": 400,
+        "observed": 400
+      },
+      {
+        "operation": "GET",
+        "endpoint": "/exhibits",
+        "caseId": "API-GET-LIMIT-not-a-number",
+        "field": "limit",
+        "partitions": [
+          "wrong-type-string"
+        ],
+        "techniques": [
+          "EP"
+        ],
+        "expected": 400,
+        "observed": 400
+      },
+      {
+        "operation": "GET",
+        "endpoint": "/exhibits",
+        "caseId": "API-GET-YEARFROM-400",
+        "field": "yearFrom",
+        "expected": 400,
+        "observed": 400
+      },
+      {
+        "operation": "POST",
+        "endpoint": "/exhibits",
         "caseId": "API-POST-EXHIBITNAME-1",
         "field": "exhibitName",
         "partitions": [
@@ -41,10 +429,12 @@
           "3-point BVA"
         ],
         "expected": 201,
-        "observed": 201
+        "observed": 201,
+        "readbackVerified": true
       },
       {
         "operation": "POST",
+        "endpoint": "/exhibits",
         "caseId": "API-POST-EXHIBITNAME-2",
         "field": "exhibitName",
         "partitions": [
@@ -56,10 +446,12 @@
           "3-point BVA"
         ],
         "expected": 201,
-        "observed": 201
+        "observed": 201,
+        "readbackVerified": true
       },
       {
         "operation": "POST",
+        "endpoint": "/exhibits",
         "caseId": "API-POST-EXHIBITNAME-3",
         "field": "exhibitName",
         "partitions": [
@@ -71,10 +463,12 @@
           "3-point BVA"
         ],
         "expected": 400,
-        "observed": 400
+        "observed": 400,
+        "readbackVerified": true
       },
       {
         "operation": "POST",
+        "endpoint": "/exhibits",
         "caseId": "API-POST-EXHIBITNAME-4",
         "field": "exhibitName",
         "partitions": [
@@ -86,10 +480,12 @@
           "3-point BVA"
         ],
         "expected": 400,
-        "observed": 400
+        "observed": 400,
+        "readbackVerified": true
       },
       {
         "operation": "POST",
+        "endpoint": "/exhibits",
         "caseId": "API-POST-EXHIBITNAME-5",
         "field": "exhibitName",
         "partitions": [
@@ -99,10 +495,12 @@
           "3-point BVA"
         ],
         "expected": 201,
-        "observed": 201
+        "observed": 201,
+        "readbackVerified": true
       },
       {
         "operation": "POST",
+        "endpoint": "/exhibits",
         "caseId": "API-POST-EXHIBITNAME-6",
         "field": "exhibitName",
         "partitions": [
@@ -112,10 +510,12 @@
           "3-point BVA"
         ],
         "expected": 201,
-        "observed": 201
+        "observed": 201,
+        "readbackVerified": true
       },
       {
         "operation": "POST",
+        "endpoint": "/exhibits",
         "caseId": "API-POST-EXHIBITNAME-7",
         "field": "exhibitName",
         "partitions": [
@@ -125,10 +525,12 @@
           "EP"
         ],
         "expected": 400,
-        "observed": 400
+        "observed": 400,
+        "readbackVerified": true
       },
       {
         "operation": "POST",
+        "endpoint": "/exhibits",
         "caseId": "API-POST-EXHIBITNAME-8",
         "field": "exhibitName",
         "partitions": [
@@ -138,10 +540,12 @@
           "EP"
         ],
         "expected": 400,
-        "observed": 400
+        "observed": 400,
+        "readbackVerified": true
       },
       {
         "operation": "POST",
+        "endpoint": "/exhibits",
         "caseId": "API-POST-CATEGORYID-9",
         "field": "categoryId",
         "partitions": [
@@ -151,10 +555,12 @@
           "EP"
         ],
         "expected": 201,
-        "observed": 201
+        "observed": 201,
+        "readbackVerified": true
       },
       {
         "operation": "POST",
+        "endpoint": "/exhibits",
         "caseId": "API-POST-CATEGORYID-10",
         "field": "categoryId",
         "partitions": [
@@ -164,10 +570,12 @@
           "EP"
         ],
         "expected": 400,
-        "observed": 400
+        "observed": 400,
+        "readbackVerified": true
       },
       {
         "operation": "POST",
+        "endpoint": "/exhibits",
         "caseId": "API-POST-CATEGORYID-11",
         "field": "categoryId",
         "partitions": [
@@ -177,10 +585,12 @@
           "EP"
         ],
         "expected": 400,
-        "observed": 400
+        "observed": 400,
+        "readbackVerified": true
       },
       {
         "operation": "POST",
+        "endpoint": "/exhibits",
         "caseId": "API-POST-CATEGORYID-12",
         "field": "categoryId",
         "partitions": [
@@ -190,10 +600,12 @@
           "EP"
         ],
         "expected": 400,
-        "observed": 400
+        "observed": 400,
+        "readbackVerified": true
       },
       {
         "operation": "POST",
+        "endpoint": "/exhibits",
         "caseId": "API-POST-YEAR-13",
         "field": "year",
         "partitions": [
@@ -205,10 +617,12 @@
           "3-point BVA"
         ],
         "expected": 400,
-        "observed": 400
+        "observed": 400,
+        "readbackVerified": true
       },
       {
         "operation": "POST",
+        "endpoint": "/exhibits",
         "caseId": "API-POST-YEAR-14",
         "field": "year",
         "partitions": [
@@ -220,10 +634,12 @@
           "3-point BVA"
         ],
         "expected": 201,
-        "observed": 201
+        "observed": 201,
+        "readbackVerified": true
       },
       {
         "operation": "POST",
+        "endpoint": "/exhibits",
         "caseId": "API-POST-YEAR-15",
         "field": "year",
         "partitions": [
@@ -233,10 +649,12 @@
           "EP"
         ],
         "expected": 201,
-        "observed": 201
+        "observed": 201,
+        "readbackVerified": true
       },
       {
         "operation": "POST",
+        "endpoint": "/exhibits",
         "caseId": "API-POST-YEAR-16",
         "field": "year",
         "partitions": [
@@ -248,10 +666,12 @@
           "3-point BVA"
         ],
         "expected": 201,
-        "observed": 201
+        "observed": 201,
+        "readbackVerified": true
       },
       {
         "operation": "POST",
+        "endpoint": "/exhibits",
         "caseId": "API-POST-YEAR-17",
         "field": "year",
         "partitions": [
@@ -263,10 +683,12 @@
           "3-point BVA"
         ],
         "expected": 400,
-        "observed": 400
+        "observed": 400,
+        "readbackVerified": true
       },
       {
         "operation": "POST",
+        "endpoint": "/exhibits",
         "caseId": "API-POST-YEAR-18",
         "field": "year",
         "partitions": [
@@ -276,10 +698,12 @@
           "3-point BVA"
         ],
         "expected": 201,
-        "observed": 201
+        "observed": 201,
+        "readbackVerified": true
       },
       {
         "operation": "POST",
+        "endpoint": "/exhibits",
         "caseId": "API-POST-YEAR-19",
         "field": "year",
         "partitions": [
@@ -289,10 +713,12 @@
           "3-point BVA"
         ],
         "expected": 201,
-        "observed": 201
+        "observed": 201,
+        "readbackVerified": true
       },
       {
         "operation": "POST",
+        "endpoint": "/exhibits",
         "caseId": "API-POST-YEAR-20",
         "field": "year",
         "partitions": [
@@ -302,10 +728,12 @@
           "EP"
         ],
         "expected": 400,
-        "observed": 400
+        "observed": 400,
+        "readbackVerified": true
       },
       {
         "operation": "POST",
+        "endpoint": "/exhibits",
         "caseId": "API-POST-YEAR-21",
         "field": "year",
         "partitions": [
@@ -315,10 +743,12 @@
           "EP"
         ],
         "expected": 201,
-        "observed": 201
+        "observed": 201,
+        "readbackVerified": true
       },
       {
         "operation": "POST",
+        "endpoint": "/exhibits",
         "caseId": "API-POST-YEAR-22",
         "field": "year",
         "partitions": [
@@ -328,10 +758,12 @@
           "EP"
         ],
         "expected": 400,
-        "observed": 400
+        "observed": 400,
+        "readbackVerified": true
       },
       {
         "operation": "POST",
+        "endpoint": "/exhibits",
         "caseId": "API-POST-COLLECTIBLEPRICE-23",
         "field": "collectiblePrice",
         "partitions": [
@@ -341,10 +773,12 @@
           "EP"
         ],
         "expected": 400,
-        "observed": 400
+        "observed": 400,
+        "readbackVerified": true
       },
       {
         "operation": "POST",
+        "endpoint": "/exhibits",
         "caseId": "API-POST-COLLECTIBLEPRICE-24",
         "field": "collectiblePrice",
         "partitions": [
@@ -356,10 +790,12 @@
           "3-point BVA"
         ],
         "expected": 201,
-        "observed": 201
+        "observed": 201,
+        "readbackVerified": true
       },
       {
         "operation": "POST",
+        "endpoint": "/exhibits",
         "caseId": "API-POST-COLLECTIBLEPRICE-25",
         "field": "collectiblePrice",
         "partitions": [
@@ -371,10 +807,12 @@
           "3-point BVA"
         ],
         "expected": 201,
-        "observed": 201
+        "observed": 201,
+        "readbackVerified": true
       },
       {
         "operation": "POST",
+        "endpoint": "/exhibits",
         "caseId": "API-POST-COLLECTIBLEPRICE-26",
         "field": "collectiblePrice",
         "partitions": [
@@ -384,10 +822,12 @@
           "3-point BVA"
         ],
         "expected": 400,
-        "observed": 400
+        "observed": 400,
+        "readbackVerified": true
       },
       {
         "operation": "POST",
+        "endpoint": "/exhibits",
         "caseId": "API-POST-COLLECTIBLEPRICE-27",
         "field": "collectiblePrice",
         "partitions": [
@@ -397,10 +837,12 @@
           "EP"
         ],
         "expected": 201,
-        "observed": 201
+        "observed": 201,
+        "readbackVerified": true
       },
       {
         "operation": "POST",
+        "endpoint": "/exhibits",
         "caseId": "API-POST-COLLECTIBLEPRICE-28",
         "field": "collectiblePrice",
         "partitions": [
@@ -410,17 +852,28 @@
           "EP"
         ],
         "expected": 400,
-        "observed": 400
+        "observed": 400,
+        "readbackVerified": true
       },
       {
         "operation": "POST",
+        "endpoint": "/exhibits",
         "caseId": "API-POST-READBACK-01",
         "expected": 201,
         "observed": 201,
-        "readback": "verified below"
+        "readbackVerified": true
+      },
+      {
+        "operation": "GET",
+        "endpoint": "/exhibits/{id}",
+        "caseId": "API-GET-BY-ID-200",
+        "field": "id",
+        "expected": 200,
+        "observed": 200
       },
       {
         "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
         "caseId": "API-PATCH-EXHIBITNAME-1",
         "field": "exhibitName",
         "partitions": [
@@ -433,10 +886,12 @@
         ],
         "expected": 200,
         "observed": 200,
+        "readbackVerified": true,
         "readback": "x"
       },
       {
         "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
         "caseId": "API-PATCH-EXHIBITNAME-2",
         "field": "exhibitName",
         "partitions": [
@@ -449,10 +904,12 @@
         ],
         "expected": 200,
         "observed": 200,
+        "readbackVerified": true,
         "readback": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
       },
       {
         "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
         "caseId": "API-PATCH-EXHIBITNAME-3",
         "field": "exhibitName",
         "partitions": [
@@ -465,10 +922,12 @@
         ],
         "expected": 400,
         "observed": 400,
+        "readbackVerified": true,
         "readback": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
       },
       {
         "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
         "caseId": "API-PATCH-EXHIBITNAME-4",
         "field": "exhibitName",
         "partitions": [
@@ -481,10 +940,12 @@
         ],
         "expected": 400,
         "observed": 400,
+        "readbackVerified": true,
         "readback": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
       },
       {
         "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
         "caseId": "API-PATCH-EXHIBITNAME-5",
         "field": "exhibitName",
         "partitions": [
@@ -495,10 +956,12 @@
         ],
         "expected": 200,
         "observed": 200,
+        "readbackVerified": true,
         "readback": "xx"
       },
       {
         "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
         "caseId": "API-PATCH-EXHIBITNAME-6",
         "field": "exhibitName",
         "partitions": [
@@ -509,10 +972,12 @@
         ],
         "expected": 200,
         "observed": 200,
+        "readbackVerified": true,
         "readback": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
       },
       {
         "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
         "caseId": "API-PATCH-EXHIBITNAME-7",
         "field": "exhibitName",
         "partitions": [
@@ -523,10 +988,12 @@
         ],
         "expected": 400,
         "observed": 400,
+        "readbackVerified": true,
         "readback": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
       },
       {
         "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
         "caseId": "API-PATCH-CATEGORYID-8",
         "field": "categoryId",
         "partitions": [
@@ -537,10 +1004,12 @@
         ],
         "expected": 200,
         "observed": 200,
-        "readback": "82f9ed20-238e-4a21-bbdb-c9098591f098"
+        "readbackVerified": true,
+        "readback": "9d678eb3-9ae1-4a31-9890-9019e765e1a3"
       },
       {
         "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
         "caseId": "API-PATCH-CATEGORYID-9",
         "field": "categoryId",
         "partitions": [
@@ -551,10 +1020,12 @@
         ],
         "expected": 400,
         "observed": 400,
-        "readback": "82f9ed20-238e-4a21-bbdb-c9098591f098"
+        "readbackVerified": true,
+        "readback": "9d678eb3-9ae1-4a31-9890-9019e765e1a3"
       },
       {
         "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
         "caseId": "API-PATCH-CATEGORYID-10",
         "field": "categoryId",
         "partitions": [
@@ -565,10 +1036,12 @@
         ],
         "expected": 400,
         "observed": 400,
-        "readback": "82f9ed20-238e-4a21-bbdb-c9098591f098"
+        "readbackVerified": true,
+        "readback": "9d678eb3-9ae1-4a31-9890-9019e765e1a3"
       },
       {
         "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
         "caseId": "API-PATCH-YEAR-11",
         "field": "year",
         "partitions": [
@@ -581,10 +1054,12 @@
         ],
         "expected": 400,
         "observed": 400,
+        "readbackVerified": true,
         "readback": 2000
       },
       {
         "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
         "caseId": "API-PATCH-YEAR-12",
         "field": "year",
         "partitions": [
@@ -597,10 +1072,12 @@
         ],
         "expected": 200,
         "observed": 200,
+        "readbackVerified": true,
         "readback": 1800
       },
       {
         "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
         "caseId": "API-PATCH-YEAR-13",
         "field": "year",
         "partitions": [
@@ -611,10 +1088,12 @@
         ],
         "expected": 200,
         "observed": 200,
+        "readbackVerified": true,
         "readback": 1950
       },
       {
         "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
         "caseId": "API-PATCH-YEAR-14",
         "field": "year",
         "partitions": [
@@ -627,10 +1106,12 @@
         ],
         "expected": 200,
         "observed": 200,
+        "readbackVerified": true,
         "readback": 2100
       },
       {
         "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
         "caseId": "API-PATCH-YEAR-15",
         "field": "year",
         "partitions": [
@@ -643,10 +1124,12 @@
         ],
         "expected": 400,
         "observed": 400,
+        "readbackVerified": true,
         "readback": 2100
       },
       {
         "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
         "caseId": "API-PATCH-YEAR-16",
         "field": "year",
         "partitions": [
@@ -657,10 +1140,12 @@
         ],
         "expected": 200,
         "observed": 200,
+        "readbackVerified": true,
         "readback": 1801
       },
       {
         "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
         "caseId": "API-PATCH-YEAR-17",
         "field": "year",
         "partitions": [
@@ -671,10 +1156,12 @@
         ],
         "expected": 200,
         "observed": 200,
+        "readbackVerified": true,
         "readback": 2099
       },
       {
         "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
         "caseId": "API-PATCH-YEAR-18",
         "field": "year",
         "partitions": [
@@ -685,10 +1172,12 @@
         ],
         "expected": 400,
         "observed": 400,
+        "readbackVerified": true,
         "readback": 2099
       },
       {
         "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
         "caseId": "API-PATCH-YEAR-19",
         "field": "year",
         "partitions": [
@@ -699,10 +1188,12 @@
         ],
         "expected": 200,
         "observed": 200,
+        "readbackVerified": true,
         "readback": null
       },
       {
         "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
         "caseId": "API-PATCH-YEAR-20",
         "field": "year",
         "partitions": [
@@ -713,10 +1204,12 @@
         ],
         "expected": 400,
         "observed": 400,
+        "readbackVerified": true,
         "readback": null
       },
       {
         "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
         "caseId": "API-PATCH-COLLECTIBLEPRICE-21",
         "field": "collectiblePrice",
         "partitions": [
@@ -727,10 +1220,12 @@
         ],
         "expected": 400,
         "observed": 400,
+        "readbackVerified": true,
         "readback": "25"
       },
       {
         "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
         "caseId": "API-PATCH-COLLECTIBLEPRICE-22",
         "field": "collectiblePrice",
         "partitions": [
@@ -743,10 +1238,12 @@
         ],
         "expected": 200,
         "observed": 200,
+        "readbackVerified": true,
         "readback": "0"
       },
       {
         "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
         "caseId": "API-PATCH-COLLECTIBLEPRICE-23",
         "field": "collectiblePrice",
         "partitions": [
@@ -759,10 +1256,12 @@
         ],
         "expected": 200,
         "observed": 200,
+        "readbackVerified": true,
         "readback": "0.01"
       },
       {
         "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
         "caseId": "API-PATCH-COLLECTIBLEPRICE-24",
         "field": "collectiblePrice",
         "partitions": [
@@ -773,10 +1272,12 @@
         ],
         "expected": 400,
         "observed": 400,
+        "readbackVerified": true,
         "readback": "0.01"
       },
       {
         "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
         "caseId": "API-PATCH-COLLECTIBLEPRICE-25",
         "field": "collectiblePrice",
         "partitions": [
@@ -787,10 +1288,12 @@
         ],
         "expected": 200,
         "observed": 200,
+        "readbackVerified": true,
         "readback": null
       },
       {
         "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
         "caseId": "API-PATCH-COLLECTIBLEPRICE-26",
         "field": "collectiblePrice",
         "partitions": [
@@ -801,43 +1304,122 @@
         ],
         "expected": 400,
         "observed": 400,
+        "readbackVerified": true,
         "readback": null
       },
       {
         "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
         "caseId": "API-LIFECYCLE-REJECT-01",
+        "field": "published",
         "expected": 400,
-        "observed": 400
+        "observed": 400,
+        "readbackVerified": true
       },
       {
         "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
         "caseId": "API-LIFECYCLE-VALIDATE-01",
+        "field": "validated",
         "expected": 200,
         "observed": 200
       },
       {
         "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
         "caseId": "API-LIFECYCLE-PUBLISH-01",
+        "field": "published",
         "expected": 200,
         "observed": 200
       },
       {
         "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
         "caseId": "API-LIFECYCLE-PUBLISHED-TO-DRAFT",
+        "field": "validated/published",
         "expected": 400,
-        "observed": 400
+        "observed": 400,
+        "readbackVerified": true
       },
       {
         "operation": "GET",
-        "caseId": "API-EXHIBIT-404",
+        "endpoint": "/exhibits/{id}",
+        "caseId": "API-GET-BY-ID-404",
+        "field": "id",
         "expected": 404,
         "observed": 404
       },
       {
+        "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
+        "caseId": "API-PATCH-BY-ID-404",
+        "field": "id",
+        "expected": 404,
+        "observed": 404
+      },
+      {
+        "operation": "DELETE",
+        "endpoint": "/exhibits/{id}",
+        "caseId": "API-DELETE-BY-ID-404",
+        "field": "id",
+        "expected": 404,
+        "observed": 404
+      },
+      {
+        "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
+        "caseId": "API-PATCH-401",
+        "field": "id",
+        "expected": 401,
+        "observed": 401
+      },
+      {
+        "operation": "DELETE",
+        "endpoint": "/exhibits/{id}",
+        "caseId": "API-DELETE-401",
+        "field": "id",
+        "expected": 401,
+        "observed": 401
+      },
+      {
+        "operation": "GET",
+        "endpoint": "/exhibits/{id}",
+        "caseId": "API-GET-BY-ID-401",
+        "field": "id",
+        "expected": 401,
+        "observed": 401
+      },
+      {
         "operation": "POST",
+        "endpoint": "/exhibits",
         "caseId": "API-AUTH-403-CREATE",
+        "field": "role",
         "expected": 403,
         "observed": 403
+      },
+      {
+        "operation": "PATCH",
+        "endpoint": "/exhibits/{id}",
+        "caseId": "API-AUTH-403-PATCH",
+        "field": "role",
+        "expected": 403,
+        "observed": 403
+      },
+      {
+        "operation": "DELETE",
+        "endpoint": "/exhibits/{id}",
+        "caseId": "API-AUTH-403-DELETE",
+        "field": "role",
+        "expected": 403,
+        "observed": 403
+      },
+      {
+        "operation": "DELETE",
+        "endpoint": "/exhibits/{id}",
+        "caseId": "API-DELETE-BY-ID-204",
+        "field": "id",
+        "expected": 204,
+        "observed": 204
       }
     ]
   },
@@ -854,6 +1436,7 @@
   },
   "cleanup": {
     "softDelete": 204,
-    "testRecordId": "c31b2129-9153-4daf-a7bd-632390118994"
+    "postDeleteReadback": 404,
+    "testRecordId": "76fbba86-cf26-43ca-ace7-daa6bc3a73bd"
   }
 }

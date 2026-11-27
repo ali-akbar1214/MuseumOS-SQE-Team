@@ -1,7 +1,9 @@
 {
+  "capturedAt": "2026-11-26T23:12:28.078Z",
   "changedConstraints": [
     {
       "field": "CreateExhibit.year",
+      "kind": "numeric range",
       "change": "minimum 1800 -> 1810, maximum 2100 -> 2090",
       "baselineBva": [
         1799,
@@ -22,6 +24,7 @@
     },
     {
       "field": "CreateExhibit.exhibitName",
+      "kind": "string length",
       "change": "maxLength 500 -> 120",
       "baselineBvaLengths": [
         1,
@@ -38,6 +41,45 @@
         121,
         2,
         119
+      ]
+    },
+    {
+      "field": "CreateExhibit.collectiblePrice",
+      "kind": "type change",
+      "change": "type number -> integer",
+      "baselineValues": [
+        -1,
+        0,
+        0.01,
+        -0.01,
+        null,
+        "not-a-number"
+      ],
+      "changedValues": [
+        -1,
+        0,
+        1,
+        0.5,
+        null,
+        "not-a-number"
+      ]
+    },
+    {
+      "field": "SearchExhibitsQuery.sortOrder",
+      "kind": "enum extension",
+      "change": "enum ['asc', 'desc'] -> ['asc', 'desc', 'relevance']",
+      "baselineValues": [
+        "asc",
+        "desc",
+        "__invalid_enum__",
+        42
+      ],
+      "changedValues": [
+        "asc",
+        "desc",
+        "relevance",
+        "__invalid_enum__",
+        42
       ]
     }
   ],

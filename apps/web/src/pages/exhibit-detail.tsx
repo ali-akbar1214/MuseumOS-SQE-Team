@@ -936,7 +936,7 @@ function OpenLibraryModal({ isbn, onClose }: { isbn: string; onClose: () => void
                     <p>{data.publish_date}</p>
                   </div>
                 )}
-                {data.number_of_pages && (
+                {Boolean(data.number_of_pages) && (
                   <div>
                     <p className="text-xs font-medium text-muted-foreground">{t('exhibit.pages')}</p>
                     <p>{data.number_of_pages}</p>
@@ -1801,7 +1801,7 @@ export function ExhibitDetailPage() {
               {exhibit.manufacturer && <p className="mt-0.5 text-muted-foreground">{exhibit.manufacturer}</p>}
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <span className="rounded bg-muted px-2 py-1 text-xs font-medium">{exhibit.category.nameEn}</span>
-                {exhibit.year && <span className="rounded bg-muted px-2 py-1 text-xs">{exhibit.year}</span>}
+                {Boolean(exhibit.year) && <span className="rounded bg-muted px-2 py-1 text-xs">{exhibit.year}</span>}
               </div>
             </>
           )}

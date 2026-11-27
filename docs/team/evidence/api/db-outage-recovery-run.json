@@ -1,0 +1,21 @@
+﻿{
+    "capturedAt":  "2026-11-26T15:30:49.5657820+05:00",
+    "result":  "PASS",
+    "failureInjection":  "real Docker PostgreSQL outage (docker stop museumos-db -\u003e PATCH -\u003e docker start museumos-db)",
+    "outageWriteHttpStatus":  500,
+    "outageWriteDetail":  "The remote server returned an error: (500) Internal Server Error.",
+    "reconnectAttemptsAfterPgReady":  2,
+    "afterFailure":  {
+                         "year":  1980,
+                         "recordsWithId":  1
+                     },
+    "retryResponses":  [
+                           2024,
+                           2024
+                       ],
+    "afterRetry":  {
+                       "year":  2024,
+                       "recordsWithId":  1
+                   },
+    "fixtureCleanup":  "soft-delete via DELETE /api/exhibits/:id in finally block"
+}

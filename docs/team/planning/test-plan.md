@@ -26,13 +26,13 @@ The API integration runner creates synthetic records and soft-deletes its own fi
 - API health endpoint returns `{"status":"ok","service":"museumos-api"}`.
 - Test account can authenticate.
 
-## Exit criteria
+## Exit criteria (Risk-Linked)
 
-1. 100% statement and branch coverage of the critical exhibit-workflow module.
-2. All high-risk API cases pass and no unexpected 5xx response occurs in 100 smoke requests.
-3. `p95 <= 500 ms` and unexpected failure rate `< 1%` for the selected exhibit read workload.
-4. No critical accessibility violation on key workflow screens.
-5. Recovery restores the same single exhibit record after one failed write and one retry.
+1. **EC-1 (Tied to Risk P1 [Score 25] & Risk P2 [Score 20]):** 100% statement, branch, function, and line coverage on `exhibit-workflow.ts` & `permission.guard.ts`, plus **100% branch coverage** gated across all 4 scoped business-logic modules (`exhibit-workflow.ts`, `permission.guard.ts`, `exhibits.controller.ts`, `exhibits.service.ts`).
+2. **EC-2 (Tied to Risk P2 [Score 20] & Risk P3 [Score 16]):** OpenAPI-generated cases covering every endpoint × method × status × parameter in scope, post-rejection read-back on every mutating error, and all 11 live RBAC checks pass (`access-checks.json`).
+3. **EC-3 (Tied to Risk P7 [Score 12] & Risk P8 [Score 12]):** `p95 <= 500 ms` and `< 1%` HTTP failure rate on authenticated exhibit read workload (`1` and `5` VUs); `0` confirmed critical `axe-core` findings and Lighthouse Accessibility `>= 0.90` across all 3 workflow screens.
+4. **EC-4 (Tied to Risk Q1 [Score 20] & Risk P1 [Score 25]):** Mandatory overall-code SonarQube quality gate **OK** (`ignoredConditions: false`), `0` ESLint errors, Stryker mutation score `>= 80%`, `4/4` real-Vitest custom mutators killed, and strict GitHub Actions CI + downstream `release-check` green with branch protection.
+5. **EC-5 (Tied to Risk P4 [Score 15] & Risk P6 [Score 15]):** Real PostgreSQL `P2003` and Docker `stop`/`start` outage recovery restore the same single exhibit record cleanly with retry and zero duplicates.
 
 ## Roles and ownership
 
@@ -40,36 +40,37 @@ The API integration runner creates synthetic records and soft-deletes its own fi
 - Member 2: API testing and OpenAPI test generation.
 - Member 3: browser use cases, accessibility, security, performance, and recovery.
 
-## Three-point estimates and actuals
+## Three-point estimates and reconstructed actuals
 
-Planning estimates are person-hours; PERT expected time is `(O + 4M + P) / 6`. Member totals reported: **Burhan Ahmed: 7.0 h**, **Syed Ali Akbar Naqvi: 13.0 h**, **Huzaifa Ali: 9.0 h** (**Team Total: 29.0 h** vs. **31.2 h** PERT, variance **-2.2 h / -7.1%**).
+Planning estimates are person-hours; PERT expected time is `(O + 4M + P) / 6`.  
+**Actual Hours Reconstruction Method:** No live stopwatch or timesheet tool was used during Weeks 1–3; therefore, replacing earlier rounded estimates, team actuals were reconstructed by combining Nov 24 member-reported package logs with objective git commit windows (`2026-11-21 20:13–20:15`, `2026-11-22` capture timestamps, `2026-11-24 01:50–02:30` `0.67 h` CI fix burst) plus timed `2026-11-26/27` remediation runs (`PR #6` / split Playwright / outage recovery / widened Stryker / SonarQube). Reconstructed totals: **Burhan Ahmed: 7.25 h**, **Syed Ali Akbar Naqvi: 14.75 h**, **Huzaifa Ali: 9.25 h** (**Team Total: 31.25 h** vs. **31.2 h** PERT, variance **+0.05 h / +0.2%**).
 
-| Work package | Owner | Optimistic | Most likely | Pessimistic | PERT | Actual | Variance |
-|---|---|---:|---:|---:|---:|---:|---:|
-| Scope, requirements, risk, traceability | Burhan | 2 | 3 | 5 | 3.2 | 2.5 | -0.7 h |
-| Complexity, white-box, MC/DC, mutation, CI | Burhan | 4 | 6 | 10 | 6.3 | 4.5 | -1.8 h |
-| API partitions, OpenAPI generator, API runs | Ali | 4 | 6 | 9 | 6.2 | 8.0 | +1.8 h |
-| Browser scenarios, accessibility, security | Huzaifa | 5 | 7 | 11 | 7.3 | 7.0 | -0.3 h |
-| Performance, recovery, evidence, report, viva | Shared (Ali 5.0 h, Huzaifa 2.0 h) | 5 | 8 | 12 | 8.2 | 7.0 | -1.2 h |
-| **Total** | **Team** | **20** | **30** | **47** | **31.2** | **29.0** | **-2.2 h (-7.1%)** |
+| Work package | Owner | Optimistic | Most likely | Pessimistic | PERT | Reconstructed Actual | Variance |
+|---|---|---:|---:|---:|---:|---:|---|
+| Scope, requirements, risk, traceability | Burhan | 2 | 3 | 5 | 3.2 | 2.25 | -0.95 h |
+| Complexity, white-box, MC/DC, mutation, CI | Burhan | 4 | 6 | 10 | 6.3 | 5.00 | -1.30 h |
+| API partitions, OpenAPI generator, API matrix runs | Ali | 4 | 6 | 9 | 6.2 | 8.75 | +2.55 h |
+| Browser scenarios, accessibility, security (ZAP/RBAC) | Huzaifa | 5 | 7 | 11 | 7.3 | 7.25 | -0.05 h |
+| Performance, DB outage recovery, remediation, report | Shared (Ali 6.00 h, Huzaifa 2.00 h) | 5 | 8 | 12 | 8.2 | 8.00 | -0.20 h |
+| **Total** | **Team** | **20** | **30** | **47** | **31.2** | **31.25** | **+0.05 h (+0.2%)** |
 
-## Exit evidence and current status (2026-11-24)
+## Exit evidence and current status (2026-11-27)
 
 | Criterion | Target | Current evidence/status |
 |---|---|---|
-| Lifecycle unit statement and branch coverage | 100% | Met: 45 passing unit tests across 5 files; `exhibit-workflow.ts` & `permission.guard.ts` 100% all metrics; `exhibits.service.ts` 97.67% branches; `exhibits.controller.ts` 92.00% branches. |
-| API generated EP/BVA suite | Every declared input; plus 2-constraint proof | Met: 28 unique EP/3-pt BVA cases, 2-constraint regeneration proof passing, and 62/62 live HTTP API outcomes passing against `museumos_sqe_test` (`api-run.json`). |
-| Browser workflows and role decisions | UC-01..UC-06 flows, persisted state, allow/deny | Met: 8/8 Playwright E2E specs pass across UC-01..UC-06 (`playwright-report.html`); 7/7 live RBAC checks pass (`access-checks.json`). |
-| axe key screens & Lighthouse | No critical/high findings; Before/After comparison | Met: 0 axe violations on Create, Detail, and Publish; multi-screen Lighthouse scored **1.00 A11y / 1.00 BP / 0.82 SEO** on both `/exhibits` and `/exhibits/:id` (up from 0.88 A11y baseline). |
-| Mutation & CI | Gate >=80%; custom mutators; 0 lint | Met: Stryker **97.85%** (91/93 killed, 2 equivalent survivors, 0 no-coverage), custom mutators **4/4 (100%)**, `pnpm lint` 0 errors, `pnpm build` exit 0; GitHub `main` CI run `45264536403` PASS, Blocked PR `#4`, Fix PR `#5`. |
-| SonarQube metrics/complexity | Analyze baseline and final | Met: baseline/final scans captured; target module Sonar complexity 22 matches manual 22; Final Sonar Way quality gate OK. |
-| k6 & DB recovery | Two 60s runs at 1 VU and 5 VU; real recovery check | Met: 4 × 60s k6 runs p95 `16.40–28.16 ms` (`0%` fail); live Docker PostgreSQL `P2003` recovery test (`db-recovery-run.json`) and browser `UC-06` PASS. |
-| OWASP ZAP & dependency audit | Passive scan + dependency triage | Met: OWASP ZAP passive scan (`zaproxy:stable`) proxied 8/8 E2E workflows (`zap-passive-report.{html,json}` — 0 High, 3 Medium headers/SRI, 2 Low, 4 Info); 26 audit advisories triaged. |
-| Team commits, actual hours & viva | Actual hours logged + member commits + viva | Actual hours recorded (`29.0 h`: Burhan `7.0 h`, Ali `13.0 h`, Huzaifa `9.0 h`). Authentic member commits, Issues `#1`–`#3`, and PR `#4`/`#5` published on `ali-akbar1214/MuseumOS-SQE-Team`; live viva defense ready. |
+| Business-logic coverage (`EC-1`) | 100% stmt/branch workflow & guard; 100% branch across all 4 files | **Met:** **46/46** unit tests (`test/team`); `exhibit-workflow.ts` & `permission.guard.ts` **100%** all metrics; `test:coverage:all` **100.00% branches** across all 4 files (`53.86%` stmts; out-of-scope lines individually justified). |
+| OpenAPI generator & API matrix (`EC-2`) | Every endpoint × method × status × param; 4-constraint proof; read-back | **Met:** 9-row API matrix covering **93/93** live HTTP outcomes against `museumos_sqe_test` (`api-run.json`), read-back after every `POST`/`PATCH` rejection, and 4-constraint regeneration (range, length, type `number→integer`, enum). |
+| Browser workflows & RBAC (`EC-2`, `EC-3`) | 1 flow per test; UI assertions on UC-03/04; read-back after 403 | **Met:** **30/30** discrete 1-flow-per-test Playwright E2E specs pass (`playwright-report.html`); **11/11** RBAC + unauthenticated checks with read-back (`access-checks.json`). |
+| Accessibility & multi-screen Lighthouse (`EC-3`) | 0 critical axe; all 3 workflow screens audited; deduplicated findings | **Met:** 0 axe violations on Create (`45`), Detail (`32`), Publish (`34`); Lighthouse on `/exhibits`, `/exhibits?new=1` (Create modal), and `/exhibits/:id` all scored **1.00 A11y / 1.00 BP / 0.82 SEO** (`A11Y-01`..`05` counted once). |
+| Mutation & mandatory CI (`EC-4`) | Stryker >=80%; real-Vitest custom mutators; 0 lint; mandatory Sonar CI | **Met:** Widened Stryker **98.97%** (`192/194` killed, 2 equivalent survivors, 0 no-cov across 3 files); custom mutators **4/4 (100%)** vs. real Vitest; `pnpm lint` 0 errors; `pnpm build` exit 0; mandatory `ci-sonar-gate.sh` + downstream `release-check` job in `quality.yml`; branch protection verified (`branch-protection.json`). |
+| SonarQube overall-code scan (`EC-4`) | Overall quality gate OK (`ignoredConditions: false`) with LCOV | Verified via fresh ephemeral local Docker SonarQube 9.9.8 overall-code scan + `MuseumOS-SQE-Overall` gate (`sonar-final*.json`) and mandatory CI step. |
+| Performance & real DB outage recovery (`EC-3`, `EC-5`) | 4×60s k6 runs (`p95 <= 500ms`); real DB stop/start with retry & 0 dupes | **Met:** k6 p95 `16.40–28.16 ms` (`0%` fail, hardware & `sleep(1)` documented); live `docker stop/start museumos-db` outage recovery (`db-outage-recovery-run.json`: `500` -> `2` reconnect attempts -> retry `[2024, 2024]` -> `1` row) + `P2003` FK recovery (`db-recovery-run.json`) PASS. |
+| OWASP ZAP & dependency audit | Prod build + API ZAP scan; package versions listed | **Partial / Hardening Open:** ZAP proxied compiled `vite preview` (`:4173`) + direct API (`:3000`) (`0 High`, 3 Medium header/SRI on preview; API `0` header alerts); 26 advisories triaged with exact `.pnpm` versions (`SEC-001` & `SEC-DEP-01` tracked). |
+| Team commits, registration, AI & viva | GitHub-linked commits; prompt archive; registration & viva rehearsal | **Open Items Tracked:** PR `#6` authored under `ali-akbar1214`'s GitHub-linked email; full AI prompt archive (`ai-prompts-archive.md`) & honest Nov 24 disclosure (`ai-use.md`); **A2 Google Sheet registration screenshot/link & team live viva rehearsal remain user-owned before submission**. |
 
-## Schedule
+## Schedule (Honest Actual Progression)
 
-Week 1 baseline and scope. Week 2 unit/API automation. Week 3 browser/accessibility/security. Week 4 performance, mutation, CI, report, viva rehearsal.
+Weeks 1–2 (before 2026-11-21): offline team coordination and scope selection without contemporaneous weekly logs (documented honestly in `weekly-report.md`). Week 3 (2026-11-21–22): initial baseline/Sonar/k6/Lighthouse/audit captures. Week 4 (2026-11-24–27): full automation expansion, CI + branch protection (`#4`, `#5`), and comprehensive audit remediation + live reruns (`PR #6`).
 
 ## Suspension/resumption
 

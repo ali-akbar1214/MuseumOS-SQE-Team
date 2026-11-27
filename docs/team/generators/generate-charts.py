@@ -97,9 +97,9 @@ def make_risk_heatmap():
     labels = {
         (4, 4): 'P1 (25)',
         (4, 3): 'P2, Q1 (20)',
-        (4, 2): 'P4, P5,\nP6, Q2 (15)',
+        (4, 2): 'P4, P5, P6,\nQ2, SEC-DEP-01 (15)',
         (3, 3): 'P3 (16)',
-        (3, 2): 'P7, P8 (12)',
+        (3, 2): 'P7, P8,\nSEC-001 (12)',
     }
     cell_colors = [
         ['#dcfce7', '#dcfce7', '#dcfce7', '#dcfce7', '#fef9c3'],
@@ -129,7 +129,7 @@ def make_risk_heatmap():
     ax.set_yticklabels(['1 Negligible', '2 Minor', '3 Moderate', '4 Major', '5 Critical'], fontsize=8.5)
     ax.set_xlabel('Likelihood', fontsize=9.5, fontweight='bold', color=NAVY)
     ax.set_ylabel('Impact', fontsize=9.5, fontweight='bold', color=NAVY)
-    ax.set_title('5x5 Product & Project Risk Matrix (10 Risks Mapped)', fontsize=11.5, fontweight='bold', color=NAVY, pad=10)
+    ax.set_title('5x5 Product & Project Risk Matrix (12 Risks Mapped)', fontsize=11.5, fontweight='bold', color=NAVY, pad=10)
     fig.tight_layout()
     fig.savefig(OUT / 'risk-heatmap.png', dpi=200)
     plt.close(fig)

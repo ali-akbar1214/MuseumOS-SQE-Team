@@ -310,7 +310,7 @@ export function ExhibitDetailPage() {
             <div>
               <p className="text-[11px] uppercase tracking-wide text-muted-foreground">{ex.category && (isEl ? ex.category.nameEl : ex.category.nameEn)}</p>
               {ex.manufacturer && <p className="text-base font-medium">{ex.manufacturer}</p>}
-              {ex.year && <p className="text-xs text-muted-foreground">{ex.year}</p>}
+              {Boolean(ex.year) && <p className="text-xs text-muted-foreground">{ex.year}</p>}
             </div>
             {/* eBay search — opens a bottom-sheet with similar listings. */}
             <button

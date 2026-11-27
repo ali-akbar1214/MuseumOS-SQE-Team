@@ -268,7 +268,7 @@ export function InventoryPage() {
                     <span className="truncate text-[11px] text-muted-foreground">{isEl ? ex.category.nameEl : ex.category.nameEn}</span>
                   </div>
                   <p className="truncate text-sm font-medium">{ex.exhibitName}</p>
-                  {(ex.manufacturer || ex.year) && (
+                  {Boolean(ex.manufacturer || ex.year) && (
                     <p className="truncate text-xs text-muted-foreground">
                       {ex.manufacturer ?? ''}
                       {ex.manufacturer && ex.year ? ' · ' : ''}

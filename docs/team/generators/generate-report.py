@@ -203,7 +203,7 @@ def build_cover_page(usable_width):
         ],
         [Paragraph('Section:', styles['CoverCell']), Paragraph('C', styles['CoverCell'])],
         [Paragraph('Department:', styles['CoverCell']), Paragraph('Software Engineering', styles['CoverCell'])],
-        [Paragraph('Report Date:', styles['CoverCell']), Paragraph('2026-11-24', styles['CoverCell'])],
+        [Paragraph('Report Date:', styles['CoverCell']), Paragraph('2026-11-27', styles['CoverCell'])],
         [
             Paragraph('Baseline Commit:', styles['CoverCell']),
             Paragraph('0ef7004ebef1c59130101fa0a56c95a50ca31900', styles['CoverCellMono']),

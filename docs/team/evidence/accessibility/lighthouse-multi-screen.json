@@ -1,16 +1,23 @@
 {
-  "capturedAt": "2026-11-23T20:21:41.629Z",
+  "capturedAt": "2026-11-26T10:27:14.757Z",
   "screens": [
     {
       "screen": "exhibits-list",
-      "url": "http://localhost:5173/exhibits",
+      "url": "http://127.0.0.1:5173/exhibits",
+      "accessibility": 1,
+      "bestPractices": 1,
+      "seo": 0.82
+    },
+    {
+      "screen": "create-exhibit-modal",
+      "url": "http://127.0.0.1:5173/exhibits?new=1",
       "accessibility": 1,
       "bestPractices": 1,
       "seo": 0.82
     },
     {
       "screen": "exhibit-detail",
-      "url": "http://localhost:5173/exhibits/d1e491cb-0978-428c-baef-b6020eaf6b29",
+      "url": "http://127.0.0.1:5173/exhibits/7245c02d-f416-4223-8e22-ea78a7e25675",
       "accessibility": 1,
       "bestPractices": 1,
       "seo": 0.82

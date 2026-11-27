@@ -82,6 +82,7 @@ async function main() {
 
     const targets = [
       { key: 'exhibits-list', url: `${WEB_URL}/exhibits` },
+      { key: 'create-exhibit-modal', url: `${WEB_URL}/exhibits?new=1` },
       ...(firstExhibitId ? [{ key: 'exhibit-detail', url: `${WEB_URL}/exhibits/${firstExhibitId}` }] : []),
     ];
 

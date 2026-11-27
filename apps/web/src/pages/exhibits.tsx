@@ -133,7 +133,7 @@ export function ExhibitsPage() {
   const imagesMenuRef = useRef<HTMLDivElement>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkOpen, setBulkOpen] = useState(false);
-  const [newExhibitOpen, setNewExhibitOpen] = useState(false);
+  const [newExhibitOpen, setNewExhibitOpen] = useState(() => params.get('new') === '1');
   const queryClient = useQueryClient();
   const { hasPermission } = useAuth();
   const canEdit = hasPermission('exhibit:write');
@@ -1204,7 +1204,7 @@ export function ExhibitsPage() {
                       )}
                       <div className="mt-auto flex items-center gap-1.5 pt-1.5 text-[11px] text-muted-foreground">
                         <span className="rounded bg-muted px-1.5 py-0.5">{lang === 'el' ? ex.category.nameEl : ex.category.nameEn}</span>
-                        {ex.year && <span>· {ex.year}</span>}
+                        {Boolean(ex.year) && <span>· {ex.year}</span>}
                       </div>
                     </div>
                   ) : (

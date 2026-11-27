@@ -2,7 +2,7 @@
   "generatedFrom": "docs\\team\\planning\\openapi.yaml",
   "openapiVersion": "3.0.3",
   "schema": "CreateExhibit",
-  "generatedAt": "2026-11-23T20:09:11.635Z",
+  "generatedAt": "2026-11-26T23:12:27.351Z",
   "properties": {
     "categoryId": {
       "required": true,
@@ -343,6 +343,177 @@
           "valid": true,
           "partitions": [
             "valid-null"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        },
+        {
+          "exists": true,
+          "value": "not-a-number",
+          "valid": false,
+          "partitions": [
+            "wrong-type-string"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        }
+      ]
+    }
+  },
+  "queryProperties": {
+    "sortOrder": {
+      "required": false,
+      "type": "string",
+      "enum": [
+        "asc",
+        "desc"
+      ],
+      "cases": [
+        {
+          "exists": true,
+          "value": "asc",
+          "valid": true,
+          "partitions": [
+            "valid-enum-asc"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        },
+        {
+          "exists": true,
+          "value": "desc",
+          "valid": true,
+          "partitions": [
+            "valid-enum-desc"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        },
+        {
+          "exists": true,
+          "value": "__invalid_enum__",
+          "valid": false,
+          "partitions": [
+            "invalid-enum"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        },
+        {
+          "exists": true,
+          "value": 42,
+          "valid": false,
+          "partitions": [
+            "wrong-type-number"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        }
+      ]
+    },
+    "limit": {
+      "required": false,
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100,
+      "cases": [
+        {
+          "exists": true,
+          "value": 0,
+          "valid": false,
+          "partitions": [
+            "invalid-below-minimum",
+            "value-0"
+          ],
+          "techniques": [
+            "EP",
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": 1,
+          "valid": true,
+          "partitions": [
+            "valid-lower-boundary",
+            "value-1"
+          ],
+          "techniques": [
+            "EP",
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": 50,
+          "valid": true,
+          "partitions": [
+            "valid-middle"
+          ],
+          "techniques": [
+            "EP"
+          ]
+        },
+        {
+          "exists": true,
+          "value": 100,
+          "valid": true,
+          "partitions": [
+            "valid-upper-boundary",
+            "value-100"
+          ],
+          "techniques": [
+            "EP",
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": 101,
+          "valid": false,
+          "partitions": [
+            "invalid-above-maximum",
+            "value-101"
+          ],
+          "techniques": [
+            "EP",
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": 2,
+          "valid": true,
+          "partitions": [
+            "value-2"
+          ],
+          "techniques": [
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": 99,
+          "valid": true,
+          "partitions": [
+            "value-99"
+          ],
+          "techniques": [
+            "3-point BVA"
+          ]
+        },
+        {
+          "exists": true,
+          "value": 1.5,
+          "valid": false,
+          "partitions": [
+            "invalid-non-integer"
           ],
           "techniques": [
             "EP"

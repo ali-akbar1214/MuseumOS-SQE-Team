@@ -7,7 +7,12 @@
     "dir": "apps/api",
     "related": true
   },
-  "mutate": ["apps/api/src/exhibits/exhibit-workflow.ts"],
+  "mutate": [
+    "apps/api/src/exhibits/exhibit-workflow.ts",
+    "apps/api/src/auth/guards/permission.guard.ts",
+    "apps/api/src/exhibits/exhibits.controller.ts:183-310"
+  ],
+  "disableTypeChecks": "apps/api/**/*.ts",
   "reporters": ["clear-text", "progress", "html", "json"],
   "coverageAnalysis": "perTest",
   "concurrency": 2,
