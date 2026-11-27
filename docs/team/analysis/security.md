@@ -64,7 +64,12 @@ Executed `scripts/team/run-zap-passive.ps1` using `ghcr.io/zaproxy/zaproxy:stabl
 
 ---
 
-## 4. Production Dependency Audit (`pnpm audit --prod`) & SonarQube Hotspots
+## 4. Production Dependency Audit Before vs. After `pnpm.overrides` & SonarQube Hotspots
 
-- `pnpm audit --prod` snapshot (`docs/team/evidence/security/dependency-audit.json`) recorded **26 advisories**: **1 Critical, 14 High, 8 Moderate, 3 Low**, each mapped with exact installed versions from `node_modules/.pnpm`, reachability analysis, and upgrade decisions in `docs/team/analysis/dependency-triage.md` (tracked under Risk `SEC-DEP-01` / P2).
-- SonarQube Community Build 9.9.8 flagged 3 baseline hotspots (`branding.ts` regex and 2 decorative `Math.random()` calls), all reviewed Safe (`0` open hotspots).
+- **Before `pnpm.overrides` (`docs/team/evidence/security/dependency-audit.json`):** `pnpm audit --prod` recorded **26 advisories**: **1 Critical, 14 High, 8 Moderate, 3 Low**.
+- **Remediation Applied (`package.json` → `pnpm.overrides`):** Pinned `"proxy-addr": ">=2.0.8"`, `"body-parser": ">=2.4.0"`, `"qs": ">=6.16.1"`, `"react-router": "^7.18.2"`, `"react-router-dom": "^7.18.2"`, `"multer": ">=2.5.0"`, and `"source-map-js": ">=1.2.2"`.
+- **After `pnpm.overrides` (`docs/team/evidence/security/dependency-audit-after.json`):** Rerun of `pnpm audit --prod` reduced advisories from **26 → 7 (`-73.1%`)**: **0 Critical (down from 1), 6 High (down from 14), 1 Moderate (down from 8), 0 Low (down from 3)**. All reachable W1/W2 Express/HTTP runtime advisories (`proxy-addr`, `body-parser`, `qs`, `multer`, `react-router`, `source-map-js`) are **resolved**. The remaining 7 advisories are non-reachable in W1/W2 text workflows (`sharp@0.34.5` [3 High, native image thumbnails], `deepmerge-ts@7.1.5` & `effect@3.21.0` [2 High, Prisma CLI build-time only], `zod@3.25.76` [1 High, bounded by `maxLength: 500`], and `i18next` [1 Moderate, static locale bundles]).
+- **SonarQube Security Hotspots (3 Upstream Hotspots Reviewed SAFE with Per-Hotspot Rationales):**
+  1. `apps/web/src/lib/branding.ts:20` (`typescript:S5852` — slow regex check): Regex validates short CSS hex color strings (`#RGB`/`#RRGGBB`) from admin branding config; bounded 3–6 hex char input cannot trigger catastrophic backtracking.
+  2. `apps/web/src/pages/dashboard.tsx:39` (`typescript:S2245` — `Math.random()`): Selects a decorative greeting sub-caption from a static UI array; never used for tokens, IDs, or security decisions.
+  3. `apps/web/src/pages/not-found.tsx:13` (`typescript:S2245` — `Math.random()`): Selects a random 404 flavor message on the Not Found screen; purely decorative UI text.

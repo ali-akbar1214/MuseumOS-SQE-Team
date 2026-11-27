@@ -1,0 +1,122 @@
+{
+  "ciRunId": 45911609511,
+  "ciJobId": 140221064023,
+  "ciRunNumber": 15,
+  "ciRunUrl": "https://github.com/ali-akbar1214/MuseumOS-SQE-Team/actions/runs/45911609511",
+  "headSha": "465760fe1ffbd7748750e9b286e30817e4771efc",
+  "capturedAt": "2026-11-26T23:37:18.8138360Z",
+  "runnerOs": "ubuntu-24.04",
+  "sonarServerImage": "sonarqube:lts-community (9.9.8.100196)",
+  "sonarScannerImage": "sonarsource/sonar-scanner-cli:latest (8.5.0.16571)",
+  "qualityGateStatus": {
+    "projectStatus": {
+      "status": "OK",
+      "conditions": [
+        {
+          "status": "OK",
+          "metricKey": "new_reliability_rating",
+          "comparator": "GT",
+          "periodIndex": 1,
+          "errorThreshold": "1",
+          "actualValue": "1"
+        },
+        {
+          "status": "OK",
+          "metricKey": "reliability_rating",
+          "comparator": "GT",
+          "errorThreshold": "1",
+          "actualValue": "1"
+        },
+        {
+          "status": "OK",
+          "metricKey": "new_security_rating",
+          "comparator": "GT",
+          "periodIndex": 1,
+          "errorThreshold": "1",
+          "actualValue": "1"
+        },
+        {
+          "status": "OK",
+          "metricKey": "security_rating",
+          "comparator": "GT",
+          "errorThreshold": "1",
+          "actualValue": "1"
+        },
+        {
+          "status": "OK",
+          "metricKey": "new_maintainability_rating",
+          "comparator": "GT",
+          "periodIndex": 1,
+          "errorThreshold": "1",
+          "actualValue": "1"
+        },
+        {
+          "status": "OK",
+          "metricKey": "sqale_rating",
+          "comparator": "GT",
+          "errorThreshold": "1",
+          "actualValue": "1"
+        },
+        {
+          "status": "OK",
+          "metricKey": "duplicated_lines_density",
+          "comparator": "GT",
+          "errorThreshold": "3",
+          "actualValue": "2.2"
+        },
+        {
+          "status": "OK",
+          "metricKey": "bugs",
+          "comparator": "GT",
+          "errorThreshold": "0",
+          "actualValue": "0"
+        },
+        {
+          "status": "OK",
+          "metricKey": "security_hotspots_reviewed",
+          "comparator": "LT",
+          "errorThreshold": "100",
+          "actualValue": "100.0"
+        },
+        {
+          "status": "OK",
+          "metricKey": "vulnerabilities",
+          "comparator": "GT",
+          "errorThreshold": "0",
+          "actualValue": "0"
+        }
+      ],
+      "periods": [
+        {
+          "index": 1,
+          "mode": "PREVIOUS_VERSION",
+          "date": "2026-11-26T23:36:00+0000"
+        }
+      ],
+      "ignoredConditions": false,
+      "period": {
+        "mode": "PREVIOUS_VERSION",
+        "date": "2026-11-26T23:36:00+0000"
+      },
+      "caycStatus": "over-compliant"
+    }
+  },
+  "componentMeasures": {
+    "component": {
+      "key": "MuseumOS-SQE-final",
+      "name": "MuseumOS-SQE-final",
+      "qualifier": "TRK",
+      "measures": [
+        { "metric": "code_smells", "value": "196", "bestValue": false },
+        { "metric": "security_hotspots", "value": "0", "bestValue": true },
+        { "metric": "duplicated_lines_density", "value": "2.2", "bestValue": false },
+        { "metric": "sqale_rating", "value": "1.0", "bestValue": true },
+        { "metric": "security_rating", "value": "1.0", "bestValue": true },
+        { "metric": "vulnerabilities", "value": "0", "bestValue": true },
+        { "metric": "security_hotspots_reviewed", "value": "100.0", "bestValue": true },
+        { "metric": "bugs", "value": "0", "bestValue": true },
+        { "metric": "reliability_rating", "value": "1.0", "bestValue": true }
+      ]
+    }
+  }
+}

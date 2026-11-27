@@ -1,0 +1,288 @@
+{
+  "actions": [],
+  "advisories": {
+    "1124066": {
+      "findings": [
+        {
+          "version": "0.34.5",
+          "paths": [
+            ".>sharp"
+          ]
+        }
+      ],
+      "found_by": null,
+      "deleted": null,
+      "references": "- https://github.com/libvips/libvips/security/advisories/GHSA-2fcj-gj27-279x\n- https://github.com/libvips/libvips/security/advisories/GHSA-523x-vhfw-6r76\n- https://github.com/libvips/libvips/security/advisories/GHSA-jmwm-wc68-mhwm\n- https://github.com/libvips/libvips/security/advisories/GHSA-r98w-4fp7-m9c7\n- https://github.com/lovell/sharp/security/advisories/GHSA-f88m-g3jw-g9cj\n- https://github.com/advisories/GHSA-f88m-g3jw-g9cj",
+      "created": "2026-07-21T22:07:17.000Z",
+      "id": 1124066,
+      "npm_advisory_id": null,
+      "overview": "### Impact\n\nA number of vulnerabilities, two rated as \"High\" severity using CVSSv4, have been discovered and fixed in the upstream libvips dependency.\n\nThose processing untrusted input with versions of sharp prior to 0.35.0 are affected.\n\n### Patches\n\n#### Using prebuilt binaries provided by sharp?\n\nMost people rely on the prebuilt binaries provided by sharp.\n\nPlease upgrade sharp to the latest version, currently 0.35.3, which provides libvips 8.18.3.\n\n#### Using a globally-installed libvips?\n\nPlease ensure you are using the latest libvips 8.18.3.\n\n### Workarounds\nAdd the following to your code to prevent sharp from decoding GIF, TIFF and VIPS images.\n```js\nsharp.block({ operation: [\"VipsForeignLoadNsgif\", \"VipsForeignLoadTiff\", \"VipsForeignLoadVips\"] });\n```",
+      "reported_by": null,
+      "title": "sharp inherited vulnerabilities in libvips: CVE-2026-33327, CVE-2026-33328, CVE-2026-35590, CVE-2026-35591",
+      "metadata": null,
+      "cves": [],
+      "access": "public",
+      "severity": "high",
+      "module_name": "sharp",
+      "vulnerable_versions": "<0.35.0",
+      "github_advisory_id": "GHSA-f88m-g3jw-g9cj",
+      "recommendation": "Upgrade to version 0.35.0 or later",
+      "patched_versions": ">=0.35.0",
+      "updated": "2026-07-21T22:07:18.000Z",
+      "cvss": {
+        "score": 0,
+        "vectorString": null
+      },
+      "cwe": [
+        "CWE-1395"
+      ],
+      "url": "https://github.com/advisories/GHSA-f88m-g3jw-g9cj"
+    },
+    "1145093": {
+      "findings": [
+        {
+          "version": "7.1.5",
+          "paths": [
+            "apps__api>@prisma/client>prisma>@prisma/config>deepmerge-ts"
+          ]
+        }
+      ],
+      "found_by": null,
+      "deleted": null,
+      "references": "- https://github.com/RebeccaStevens/deepmerge-ts/security/advisories/GHSA-ggr8-5vv4-36mx\n- https://github.com/RebeccaStevens/deepmerge-ts/releases/tag/v8.0.0\n- https://github.com/advisories/GHSA-ggr8-5vv4-36mx",
+      "created": "2026-08-17T13:32:13.000Z",
+      "id": 1145093,
+      "npm_advisory_id": null,
+      "overview": "### Summary\n\n`deepmerge()` and `deepmergeInto()` can be crashed with a crafted recursive object graph. When both merged values contain self-references at the same property path, the library recurses until Node throws `RangeError: Maximum call stack size exceeded`.\n\n### Details\n\nRecord merging is implemented recursively. For each enumerable key, the library collects the values from every input object and immediately calls the same merge routine on that property.\n\nThere is no visited-object tracking, pair tracking, or cycle detection in that recursion. As a result, if two merged records both point back to themselves through the same key path, the merge logic keeps revisiting the same object pair forever.\n\nThis is reachable through the real public API:\n\n* `deepmerge(...)`\n* `deepmergeCustom(...)(...)`\n* `deepmergeInto(target, ...)`\n* `deepmergeIntoCustom(...)(target, ...)`\n\nThe issue only occurs when recursive object graphs are supplied. Plain JSON alone does not create this condition.\n\n### PoC\n\n```js\nimport { deepmerge, deepmergeInto } from \"deepmerge-ts\";\n\nconst left = {};\nleft.self = left;\n\nconst right = {};\nright.self = right;\n\ntry {\n  deepmerge(left, right);\n} catch (error) {\n  console.log(error.name, error.message);\n  // Expected: the merge should reject or safely handle recursive input without exhausting the stack.\n  // Vulnerable behavior: RangeError Maximum call stack size exceeded\n}\n\nconst target = {};\ntarget.self = target;\n\nconst source = {};\nsource.self = source;\n\ntry {\n  deepmergeInto(target, source);\n} catch (error) {\n  console.log(error.name, error.message);\n  // Expected: the merge should reject or safely handle recursive input without exhausting the stack.\n  // Vulnerable behavior: RangeError Maximum call stack size exceeded\n}\n```\n\n### Impact\n\nApplications that pass attacker-controlled recursive object graphs into these APIs can be forced into a synchronous crash path. In Node.js services, that can terminate request handling for the affected process or trigger repeated worker restarts until the malicious input is blocked.",
+      "reported_by": null,
+      "title": "DeepmergeTS has stack exhaustion when merging recursive object graphs",
+      "metadata": null,
+      "cves": [
+        "CVE-2026-40345"
+      ],
+      "access": "public",
+      "severity": "high",
+      "module_name": "deepmerge-ts",
+      "vulnerable_versions": "<8.0.0",
+      "github_advisory_id": "GHSA-ggr8-5vv4-36mx",
+      "recommendation": "Upgrade to version 8.0.0 or later",
+      "patched_versions": ">=8.0.0",
+      "updated": "2026-08-17T13:32:14.000Z",
+      "cvss": {
+        "score": 0,
+        "vectorString": null
+      },
+      "cwe": [
+        "CWE-674"
+      ],
+      "url": "https://github.com/advisories/GHSA-ggr8-5vv4-36mx"
+    },
+    "1193725": {
+      "findings": [
+        {
+          "version": "0.34.5",
+          "paths": [
+            ".>sharp"
+          ]
+        }
+      ],
+      "found_by": null,
+      "deleted": null,
+      "references": "- https://github.com/lovell/sharp/security/advisories/GHSA-rgj7-g3m4-5g8c\n- https://github.com/strukturag/libheif/security/advisories/GHSA-2jg2-4ch7-h545\n- https://github.com/strukturag/libheif/security/advisories/GHSA-g89c-p67h-r497\n- https://github.com/lovell/sharp/releases/tag/v0.35.4\n- https://github.com/advisories/GHSA-rgj7-g3m4-5g8c",
+      "created": "2026-09-08T21:25:11.000Z",
+      "id": 1193725,
+      "npm_advisory_id": null,
+      "overview": "### Impact\nA number of vulnerabilities, two rated as \"Critical\" severity using CVSSv3, have been discovered and fixed in the upstream libheif dependency. These can lead to possible remote code execution (RCE) on glibc-based Linux when run under certain conditions.\n\nThe attack vector for these claims to be \"network\" however sharp does not provide any networking features so this vulnerability is down-rated to a \"High\" severity using CVSSv4 but please note its Subsequent System Impact.\n\nThose processing untrusted input with versions of sharp prior to 0.35.4 are affected.\n\n### Patches\n\n#### Using prebuilt binaries provided by sharp?\n\nMost people rely on the prebuilt binaries provided by sharp.\n\nPlease upgrade sharp to the latest version, currently 0.35.4, which provides libheif 1.23.2.\n\n#### Using a globally-installed libheif?\n\nPlease ensure you are using the latest libheif 1.23.2.\n\n### Workarounds\nAdd the following to your code to prevent sharp from decoding AVIF images.\n```js\nsharp.block({ operation: [\"VipsForeignLoadHeif\"] });\n```\n\nEnsure you are using a `node` executable binary compiled as a Position Independent Executable (PIE). Most Linux package managers already do this for protection against RCE however be warned that the \"official\" Node.js binaries do not.\n\n### References\n- [CVE-2026-84383](https://github.com/strukturag/libheif/security/advisories/GHSA-g89c-p67h-r497)\n- https://github.com/strukturag/libheif/security/advisories/GHSA-2jg2-4ch7-h545",
+      "reported_by": null,
+      "title": "sharp: Vulnerabilities in libheif: GHSA-g89c-p67h-r497 and GHSA-2jg2-4ch7-h545",
+      "metadata": null,
+      "cves": [],
+      "access": "public",
+      "severity": "high",
+      "module_name": "sharp",
+      "vulnerable_versions": "<0.35.4",
+      "github_advisory_id": "GHSA-rgj7-g3m4-5g8c",
+      "recommendation": "Upgrade to version 0.35.4 or later",
+      "patched_versions": ">=0.35.4",
+      "updated": "2026-09-08T21:25:12.000Z",
+      "cvss": {
+        "score": 0,
+        "vectorString": null
+      },
+      "cwe": [
+        "CWE-122"
+      ],
+      "url": "https://github.com/advisories/GHSA-rgj7-g3m4-5g8c"
+    },
+    "1241331": {
+      "findings": [
+        {
+          "version": "0.34.5",
+          "paths": [
+            ".>sharp"
+          ]
+        }
+      ],
+      "found_by": null,
+      "deleted": null,
+      "references": "- https://github.com/lovell/sharp/security/advisories/GHSA-wq5f-xc86-pv6w\n- https://github.com/lovell/sharp/commit/96de105d9d36ab04c76c2b78b97255171630d236\n- https://github.com/lovell/sharp/releases/tag/v0.35.5\n- https://gitlab.gnome.org/GNOME/librsvg/-/work_items/1241\n- https://www.cve.org/CVERecord?id=CVE-2026-96889\n- https://github.com/advisories/GHSA-wq5f-xc86-pv6w",
+      "created": "2026-10-06T13:43:57.000Z",
+      "id": 1241331,
+      "npm_advisory_id": null,
+      "overview": "### Impact\n\nA memory-related vulnerability has been discovered and fixed in the upstream librsvg dependency. When certain runtime-specific conditions apply, this vulnerability can lead to possible remote code execution (RCE) on glibc-based Linux.\n\n### Patches\n\n#### Using prebuilt binaries provided by sharp?\n\nMost people rely on the prebuilt binaries provided by sharp.\n\nPlease upgrade sharp to the latest version, currently 0.35.5, which provides librsvg 2.63.2.\n\n#### Using a globally-installed librsvg?\n\nPlease ensure you are using the latest librsvg 2.63.2.\n\n### Workarounds\n\nAdd the following to your code to prevent sharp from decoding SVG images.\n```js\nsharp.block({ operation: [\"VipsForeignLoadSvg\"] });\n```\n\nTo avoid RCE, ensure you are using a `node` executable binary compiled as a Position Independent Executable (PIE). Most Linux package managers already use this security-hardening feature however be warned that the \"official\" Node.js binaries do not.\n1",
+      "reported_by": null,
+      "title": "sharp : Vulnerability in librsvg dependency CVE-2026-96889",
+      "metadata": null,
+      "cves": [],
+      "access": "public",
+      "severity": "high",
+      "module_name": "sharp",
+      "vulnerable_versions": "<0.35.5",
+      "github_advisory_id": "GHSA-wq5f-xc86-pv6w",
+      "recommendation": "Upgrade to version 0.35.5 or later",
+      "patched_versions": ">=0.35.5",
+      "updated": "2026-10-06T13:43:58.000Z",
+      "cvss": {
+        "score": 0,
+        "vectorString": null
+      },
+      "cwe": [
+        "CWE-416",
+        "CWE-1395"
+      ],
+      "url": "https://github.com/advisories/GHSA-wq5f-xc86-pv6w"
+    },
+    "1243066": {
+      "findings": [
+        {
+          "version": "3.25.76",
+          "paths": [
+            "apps__api>zod"
+          ]
+        }
+      ],
+      "found_by": null,
+      "deleted": null,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2023-54404\n- https://github.com/colinhacks/zod/issues/1872\n- https://github.com/colinhacks/zod/pull/6475\n- https://www.vulncheck.com/advisories/zod-uncontrolled-resource-consumption-via-array-validation\n- https://github.com/colinhacks/zod/pull/6652\n- https://github.com/colinhacks/zod/commit/a0ebf970f2d752e5f58527cd2942ff48be4f46bd\n- https://github.com/advisories/GHSA-mrhx-c7xc-m3w5",
+      "created": "2026-10-01T18:32:46.000Z",
+      "id": 1243066,
+      "npm_advisory_id": null,
+      "overview": "Zod schema-validation library through 4.6.5 contains an uncontrolled resource consumption vulnerability that allows attackers to exhaust memory by submitting a large array to an application using an array schema without a length constraint. Attackers can exploit the handleArrayResult parse logic in $ZodArray, which accumulates every validation issue for each failing element with no cap or early termination, causing the process to allocate excessive issue objects and crash due to out-of-memory conditions.",
+      "reported_by": null,
+      "title": "Zod can exhaust memory while validating oversized constrained collections",
+      "metadata": null,
+      "cves": [
+        "CVE-2023-54404"
+      ],
+      "access": "public",
+      "severity": "high",
+      "module_name": "zod",
+      "vulnerable_versions": "<4.6.6",
+      "github_advisory_id": "GHSA-mrhx-c7xc-m3w5",
+      "recommendation": "Upgrade to version 4.6.6 or later",
+      "patched_versions": ">=4.6.6",
+      "updated": "2026-10-23T18:26:52.000Z",
+      "cvss": {
+        "score": 7.5,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+      },
+      "cwe": [
+        "CWE-770"
+      ],
+      "url": "https://github.com/advisories/GHSA-mrhx-c7xc-m3w5"
+    },
+    "1248071": {
+      "findings": [
+        {
+          "version": "3.21.0",
+          "paths": [
+            "apps__api>@prisma/client>prisma>@prisma/config>effect"
+          ]
+        }
+      ],
+      "found_by": null,
+      "deleted": null,
+      "references": "- https://github.com/Effect-TS/effect/security/advisories/GHSA-7589-6fvf-x4pw\n- https://nvd.nist.gov/vuln/detail/CVE-2026-121707\n- https://github.com/Effect-TS/effect/pull/6761\n- https://github.com/Effect-TS/effect/commit/3cc3c6e1a64cbdc360e9d28e44f3ec3ce0ece6e3\n- https://github.com/Effect-TS/effect/releases/tag/effect@3.22.1\n- https://github.com/advisories/GHSA-7589-6fvf-x4pw",
+      "created": "2026-11-19T20:51:01.000Z",
+      "id": 1248071,
+      "npm_advisory_id": null,
+      "overview": "### Impact\n\n`Schema.TemplateLiteral` compiles each `Schema.String` span to the lazy wildcard `[\\s\\S]*?` and decodes input by running the resulting regular expression against it. When a template has two or more `Schema.String` spans, for example:\n\n```ts\nSchema.TemplateLiteral(Schema.String, \":\", Schema.String, \":\", Schema.String, \"X\")\n```\n\nthe regex contains several ambiguous wildcards. A non-matching input makes the backtracking engine try combinations across all of them, so matching time grows cubically with input length. A 5,000-character string of `:` characters blocks the event loop for about 15 seconds.\n\nApplications that decode untrusted input with such a schema are affected. That includes `Schema.decodeUnknown`, `Schema.decodeUnknownSync` and `Schema.is`, and anything built on them, such as `HttpApi` request payloads and `@effect/rpc` payloads.\n\n### Patches\n\nFixed in `effect@3.22.1` (#6761). Template literals whose spans are all `Schema.String` are now matched with a linear left-to-right scan instead of a regular expression.\n\n### Workarounds\n\nIf you can't upgrade, check the input length before the template literal runs. Adding `Schema.maxLength` with `.pipe` doesn't help, because the filter runs after the regex. Put the length check on the input side instead:\n\n```ts\nSchema.compose(Schema.String.pipe(Schema.maxLength(256)), MyTemplateLiteral)\n```\n\nRejecting oversized request bodies before they reach the schema also works.",
+      "reported_by": null,
+      "title": "Effect: ReDoS in Schema.TemplateLiteral compiled regex",
+      "metadata": null,
+      "cves": [
+        "CVE-2026-121707"
+      ],
+      "access": "public",
+      "severity": "high",
+      "module_name": "effect",
+      "vulnerable_versions": "<=3.22.0",
+      "github_advisory_id": "GHSA-7589-6fvf-x4pw",
+      "recommendation": "Upgrade to version 3.22.1 or later",
+      "patched_versions": ">=3.22.1",
+      "updated": "2026-11-19T20:51:02.000Z",
+      "cvss": {
+        "score": 0,
+        "vectorString": null
+      },
+      "cwe": [
+        "CWE-1333"
+      ],
+      "url": "https://github.com/advisories/GHSA-7589-6fvf-x4pw"
+    },
+    "1250194": {
+      "findings": [
+        {
+          "version": "26.0.10",
+          "paths": [
+            "apps__pwa>i18next"
+          ]
+        }
+      ],
+      "found_by": null,
+      "deleted": null,
+      "references": "- https://github.com/i18next/i18next/security/advisories/GHSA-6jcc-5g8w-32mx\n- https://nvd.nist.gov/vuln/detail/CVE-2026-63402\n- https://github.com/i18next/i18next/commit/642137b7786d83661ec3ee53027798dc4b81d30a\n- https://github.com/i18next/i18next/releases/tag/v26.3.4\n- https://github.com/advisories/GHSA-6jcc-5g8w-32mx",
+      "created": "2026-11-23T20:53:00.000Z",
+      "id": 1250194,
+      "npm_advisory_id": null,
+      "overview": "### Summary\n\n`deepExtend` in `src/utils.js` (reached via the public `addResourceBundle(lng, ns, data, deep, overwrite)` API) checked key existence with the `in` operator, which walks the prototype chain. A source key matching an inherited built-in (e.g. `hasOwnProperty`, `toString`, `valueOf`) therefore caused the function to recurse into the shared object on `Object.prototype`. With `overwrite: true`, a nested value could overwrite a property of that shared built-in — for example setting `Object.prototype.hasOwnProperty.call` to a non-callable value — corrupting it process-wide and causing an unrecoverable denial of service.\n\nThis is distinct from CVE-2026-48713 (i18next-fs-backend) and CVE-2026-48714 (i18next-http-middleware), which are prototype pollution via `setPath`/key-walking in different packages. This issue is in i18next core, via a different mechanism (the `in` operator in `deepExtend`), and is gated behind a non-default call configuration.\n\n### Details\n\n`src/utils.js` (&le; 26.3.3):\n\n```js\nexport const deepExtend = (target, source, overwrite) => {\n  for (const prop in source) {\n    if (prop !== '__proto__' && prop !== 'constructor') {\n      if (prop in target) {            // <-- walks the prototype chain\n        if (isString(target[prop]) || target[prop] instanceof String ||\n            isString(source[prop]) || source[prop] instanceof String) {\n          if (overwrite) target[prop] = source[prop];\n        } else {\n          deepExtend(target[prop], source[prop], overwrite);\n        }\n      } else {\n        target[prop] = source[prop];\n      }\n    }\n  }\n  return target;\n};\n```\n\nFor `source = { hasOwnProperty: { call: \"corrupted\" } }` and `target = {}`: `\"hasOwnProperty\" in target` is `true` (inherited from `Object.prototype`), so the code recurses with `target = Object.prototype.hasOwnProperty`. In that call, `\"call\" in target` is `true` (inherited from `Function.prototype`), `source.call` is a string, and with `overwrite: true` the assignment sets an own `call` property on `Object.prototype.hasOwnProperty` to the string `\"corrupted\"`. Every subsequent `Object.prototype.hasOwnProperty.call(...)` then throws `TypeError`, including i18next's own internals.\n\nThe existing `__proto__`/`constructor` guard does not cover this, because the corruption target is an inherited built-in *function*, not the prototype object itself.\n\n### Proof of Concept\n\n```js\nimport i18next from 'i18next';\n\nawait i18next.init({ lng: 'en', resources: { en: { translation: {} } } });\n\nconst payload = { hasOwnProperty: { call: 'corrupted' } };\ni18next.addResourceBundle('en', 'translation', payload, /* deep */ true, /* overwrite */ true);\n\n// Process-wide corruption:\nObject.prototype.hasOwnProperty.call({}, 'test'); // TypeError: ... is not a function\n```\n\n### Impact\n\nDenial of service (process-wide, unrecoverable) and limited integrity impact (a shared built-in property is set to an attacker-supplied value).\n\n**Preconditions (why severity is Medium, not High):** the application must pass attacker-controlled data into `addResourceBundle` with **both** `deep: true` and `overwrite: true`. No standard i18next backend or integration does this; it only occurs in explicit application code that merges untrusted content. The default `addResourceBundle` path (no deep merge, or `overwrite` falsy) is not affected.\n\n### Patch\n\nFixed in i18next 26.3.4 by checking existence with `Object.prototype.hasOwnProperty.call(target, prop)` instead of the `in` operator, so inherited keys are copied as plain own data instead of triggering recursion.",
+      "reported_by": null,
+      "title": "i18next deepExtend recurses into inherited built-ins, allowing corruption of shared built-in objects (DoS)",
+      "metadata": null,
+      "cves": [
+        "CVE-2026-63402"
+      ],
+      "access": "public",
+      "severity": "moderate",
+      "module_name": "i18next",
+      "vulnerable_versions": "<26.3.4",
+      "github_advisory_id": "GHSA-6jcc-5g8w-32mx",
+      "recommendation": "Upgrade to version 26.3.4 or later",
+      "patched_versions": ">=26.3.4",
+      "updated": "2026-11-23T20:53:01.000Z",
+      "cvss": {
+        "score": 5.9,
+        "vectorString": "CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:N/I:L/A:H"
+      },
+      "cwe": [
+        "CWE-471",
+        "CWE-1321"
+      ],
+      "url": "https://github.com/advisories/GHSA-6jcc-5g8w-32mx"
+    }
+  },
+  "muted": [],
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 1,
+      "high": 6,
+      "critical": 0
+    },
+    "dependencies": 340,
+    "devDependencies": 0,
+    "optionalDependencies": 0,
+    "totalDependencies": 340
+  }
+}
