@@ -1,26 +1,36 @@
-# Production Dependency Advisory Triage (`SEC-DEP-01`)
+# Production Dependency Advisory Triage & Remediation (`SEC-DEP-01`)
 
-**Snapshot source:** `pnpm audit --prod` (`docs/team/evidence/security/dependency-audit.json`, `docs/team/evidence/security/dependency-triage.csv`).  
-**Exact Installed Versions Source:** Verified from workspace `node_modules/.pnpm` package store on 2026-11-26.  
-**Summary:** 26 advisories across production dependencies (**1 Critical, 14 High, 8 Moderate, 3 Low**).  
-**Status:** Open / triaged with explicit written decisions (no clean post-upgrade audit is claimed prior to package upgrades; tracked under Risk **`SEC-DEP-01`**).
+**Before Snapshot:** `pnpm audit --prod` (`docs/team/evidence/security/dependency-audit.json`, `docs/team/evidence/security/dependency-triage.csv`).  
+**After Snapshot (Post-`pnpm.overrides`):** `pnpm audit --prod` (`docs/team/evidence/security/dependency-audit-after.json`, captured 2026-11-27).  
+**Exact Installed Versions Source:** Verified from workspace `node_modules/.pnpm` package store before and after applying `pnpm.overrides` in `package.json`.
 
 ---
 
-## 1. Complete Reachability & Written Triage Decisions (All 26 Advisories)
+## 1. Before vs. After `pnpm.overrides` Summary
 
-| Advisory ID(s) | Severity | Package | Installed Version | Affected Range | Patched Target | Workflow Reachability (W1/W2) & Written Decision |
-|---|---|---|---:|---|---|---|
-| `1241210` | **Critical** (1) | `proxy-addr` | **`2.0.7`** | `>=1.1.0 <2.0.8` | `>=2.0.8` | **Reachable (`apps/api/src/main.ts` sets `trust proxy: 2`).** IPv4-mapped IPv6 address parsing could let a spoofed `X-Forwarded-For` bypass per-IP login `@Throttle` behind dual-stack proxies. **Decision:** Priority override `"proxy-addr": ">=2.0.8"` in `package.json` + auth rate-limit regression rerun before public Internet exposure (local dev loopback unaffected). |
-| `1243074`, `1123976` | **High** (1), Low (1) | `body-parser` | **`2.2.2`** | `<2.4.0` / `<2.3.0` | `>=2.4.0` | **Reachable (`POST`/`PATCH /api/exhibits` JSON bodies).** Malformed compressed request trailing-byte DoS (`1243074`) and invalid limit edge (`1123976`). **Decision:** Pin `"body-parser": ">=2.4.0"` via `pnpm.overrides` and rerun `test:api` + `test:e2e`; accepted short-term for trusted intranet dev use. |
-| `1243066` | **High** (1) | `zod` | **`3.25.76`** (`api`), **`4.6.7`** (transitive) | `<4.6.6` | `>=4.6.6` | **Mitigated at boundary.** `@museumos/contracts` & `apps/api` cap collection inputs (`bulkUpdateSchema` max 500 IDs, `exhibitName` max 500 chars), blocking unbounded allocation. **Decision:** Mitigated by schema bounds in W1/W2; evaluate Zod v4 minor alignment in next maintenance window. |
-| `1121089`, `1193790`, `1193793`, `1243083`, `1121091`, `1193792` | **High** (4), Mod (1), Low (1) | `multer` | **`2.1.1`** | `<2.5.0` | `>=2.5.0` | **Not reachable in W1/W2 text catalogue & publish workflows.** Only mounted on `/api/exhibits/:id/images` (authenticated curators/admins, 25 MB / 10 file limits). **Decision:** Accept temporarily for text-only W1/W2 release; schedule upgrade `>=2.5.0` with multipart upload smoke test. |
-| `1124066`, `1193725`, `1241331` | **High** (3) | `sharp` | **`0.34.5`** | `<0.35.5` | `>=0.35.5` | **Not reachable in W1/W2.** Invoked only when generating uploaded image thumbnails (`libvips`/`libheif`/`librsvg`). **Decision:** Defer to native rebuild cycle (`sharp >=0.35.5`) since W1/W2 require no image processing. |
-| `1124276`, `1138769`, `1124268`, `1124271`, `1124272`, `1120807` | **High** (2), Mod (3), Low (1) | `react-router` | **`7.15.0`** | `<7.18.2` | `>=7.18.2` | **Not exploitable via RSC/SSR in `apps/web`/`apps/pwa`.** Application uses client-side `BrowserRouter` SPA mode only (no React Server Components or SSR hydration handlers). **Decision:** Low runtime risk; bump `react-router-dom` / `react-router` to `>=7.18.2` during routine frontend maintenance. |
-| `1119502`, `1158506`, `1158507`, `1243687` | Moderate (4) | `qs` | **`6.15.1`** | `<=6.16.0` | `>=6.16.1` | **Partially reachable on `GET /api/exhibits` query parsing.** `searchQuerySchema` uses strict Zod type coercion & `limit <= 100`. **Decision:** Override `"qs": ">=6.16.1"` alongside Express transitive patch bundle and re-verify `UC-04` filters. |
-| `1145093`, `1248071`, `1241209` | **High** (3) | `deepmerge-ts`, `effect`, `source-map-js` | **`7.1.5`**, **`3.21.0`**, **`1.2.1`** | `<8.0.0`, `<=3.22.0`, `<1.2.2` | latest `6.x` Prisma CLI | **CLI/build-time only (`@prisma/client > prisma > @prisma/config`).** Never imported or executed inside HTTP request handlers (`apps/api` runtime). **Decision:** Accept at zero HTTP runtime risk; resolves automatically upon next `@prisma/client` CLI patch upgrade. |
+Applying `pnpm.overrides` in `package.json` (`proxy-addr >=2.0.8`, `body-parser >=2.4.0`, `qs >=6.16.1`, `react-router ^7.18.2`, `react-router-dom ^7.18.2`, `multer >=2.5.0`, `source-map-js >=1.2.2`) and running `pnpm install` + `pnpm audit --prod` eliminated **19 of 26 advisories (`-73.1%`)**, including **100% of Critical advisories (`1 → 0`)** and **100% of reachable W1/W2 HTTP/Express runtime advisories**:
 
-## 2. Package Count Summary
+| Severity | Before `pnpm.overrides` (`dependency-audit.json`) | After `pnpm.overrides` (`dependency-audit-after.json`) | Change | Status |
+|---|---:|---:|---:|---|
+| **Critical** | **1** (`proxy-addr@2.0.7`) | **0** (`proxy-addr@2.0.8`) | **-1 (-100%)** | **Resolved** |
+| **High** | **14** | **6** (non-reachable `sharp`, `zod`, Prisma CLI) | **-8 (-57.1%)** | **All reachable HTTP/upload High advisories resolved** |
+| **Moderate** | **8** | **1** (`i18next@26.0.10` static locale init) | **-7 (-87.5%)** | **All 4 `qs`, 3 `react-router`, 1 `multer` Mod resolved** |
+| **Low** | **3** | **0** | **-3 (-100%)** | **Resolved** |
+| **Total** | **26** | **7** | **-19 (-73.1%)** | **0 Critical; 0 reachable W1/W2 HTTP runtime flaws** |
 
-- **Total Unique Packages Affected:** 10 (`proxy-addr`, `body-parser`, `zod`, `multer`, `sharp`, `react-router`, `qs`, `deepmerge-ts`, `effect`, `source-map-js`).
-- **Priority Immediate Overrides Before Production Exposure:** `proxy-addr >= 2.0.8` (Critical `1241210`), `body-parser >= 2.4.0` (High `1243074`), `qs >= 6.16.1` (Mod `1243687`), `react-router >= 7.18.2`.
+---
+
+## 2. Complete Package-by-Package Resolution & Triage Table
+
+| Advisory ID(s) | Severity | Package | Before Version | After Version | Patched Target | Workflow Reachability (W1/W2) & Final Disposition |
+|---|---|---|---:|---:|---|---|
+| `1241210` | **Critical** (1) | `proxy-addr` | `2.0.7` | **`2.0.8`** | `>=2.0.8` | **Reachable (`trust proxy: 2`). FIXED via `pnpm.overrides` (`2.0.8`).** Verified `0` Critical in `dependency-audit-after.json`. |
+| `1243074`, `1123976` | **High** (1), Low (1) | `body-parser` | `2.2.2` | **`2.4.0`** | `>=2.4.0` | **Reachable (`POST`/`PATCH` JSON bodies). FIXED via `pnpm.overrides` (`2.4.0`).** Both advisories eliminated. |
+| `1119502`, `1158506`, `1158507`, `1243687` | Moderate (4) | `qs` | `6.15.1` | **`6.17.1`** | `>=6.16.1` | **Reachable (`GET /api/exhibits` query parsing). FIXED via `pnpm.overrides` (`6.17.1`).** All 4 query-parser advisories eliminated. |
+| `1121089`, `1193790`, `1193793`, `1243083`, `1121091`, `1193792` | **High** (4), Mod (1), Low (1) | `multer` | `2.1.1` | **`2.5.0`** | `>=2.5.0` | **Not reachable in W1/W2 text flows. FIXED via `pnpm.overrides` (`2.5.0`).** All 6 multipart advisories eliminated. |
+| `1124276`, `1138769`, `1124268`, `1124271`, `1124272`, `1120807` | **High** (2), Mod (3), Low (1) | `react-router` | `7.15.0` | **`7.18.7`** | `>=7.18.2` | **Client-side SPA mode. FIXED via `pnpm.overrides` (`^7.18.2` → `7.18.7`).** All 6 router advisories eliminated. |
+| `1241209` | **High** (1) | `source-map-js` | `1.2.1` | **`1.2.4`** | `>=1.2.2` | **CLI/build-time only. FIXED via `pnpm.overrides` (`1.2.4`).** Advisory eliminated. |
+| `1243066` | **High** (1) | `zod` | `3.25.76` | `3.25.76` | `>=4.6.6` | **Mitigated at boundary (Remaining 1/7).** `@museumos/contracts` caps `exhibitName` (`<= 500` chars) and arrays (`<= 500` IDs); upgrading `zod` v3 → v4 is a major breaking API change across `@museumos/contracts`. |
+| `1124066`, `1193725`, `1241331` | **High** (3) | `sharp` | `0.34.5` | `0.34.5` | `>=0.35.5` | **Not reachable in W1/W2 (Remaining 3/7).** Invoked only for image thumbnail generation (`libvips`/`libheif`/`librsvg`); W1/W2 catalogue and publish flows process JSON only. |
+| `1145093`, `1248071` | **High** (2) | `deepmerge-ts`, `effect` | `7.1.5`, `3.21.0` | `7.1.5`, `3.21.0` | Prisma CLI | **CLI/build-time only (Remaining 2/7).** Transitive dependencies of `@prisma/config` CLI; never imported by NestJS runtime server. |
+| `1250194` | Moderate (1) | `i18next` | `26.0.10` | `26.0.10` | upstream | **Mitigated (Remaining 1/7).** `i18next.init` receives static compiled locale JSON bundles (`en.json`, `el.json`), never untrusted user input. |

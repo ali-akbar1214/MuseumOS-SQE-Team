@@ -67,17 +67,22 @@ Predicate: $D = C_1 \land C_2 \land C_3$ ($C_1$: `validated`, $C_2$: `exhibitNam
 
 ---
 
-## 3. Server-Side 100% Branch Coverage & Line-by-Line Out-of-Scope Defense
+## 3. Server-Side Coverage: W1/W2 In-Scope Methods vs. Whole-File Istanbul & v8
 
-Running `pnpm --filter @museumos/api exec vitest run test/team --coverage` (CI-gated via `apps/api/vitest.config.ts`) and `pnpm test:coverage:all` (`46/46` passing tests across 5 files; `docs/team/evidence/coverage/coverage-all-business-logic.json`) achieves **100.00% branch coverage across all four scoped modules**:
+### Why v8 Reported 100% Whole-File Branch Coverage Beside 53.99% / 46.01% Statements
 
-| File | Statements | Branches | Functions | Lines | CI Threshold Gate |
-|---|---:|---:|---:|---:|---|
-| `apps/api/src/exhibits/exhibit-workflow.ts` | **100.00%** (39/39) | **100.00%** (30/30) | **100.00%** (5/5) | **100.00%** (39/39) | 100% Stmts/Branch/Func/Lines |
-| `apps/api/src/auth/guards/permission.guard.ts` | **100.00%** (24/24) | **100.00%** (11/11) | **100.00%** (2/2) | **100.00%** (24/24) | 100% Stmts/Branch/Func/Lines |
-| `apps/api/src/exhibits/exhibits.controller.ts` | 53.99% (in-scope 100%) | **100.00%** | 28.00% | 53.99% | 100% Branch Gate (`test:coverage:all`) |
-| `apps/api/src/exhibits/exhibits.service.ts` | 46.01% (in-scope 100%) | **100.00%** | 50.00% | 46.01% | 100% Branch Gate (`test:coverage:all`) |
-| **Combined Scoped Total** | **53.86%** | **100.00%** | **45.83%** | **53.86%** | **`--coverage.thresholds.branches=100`** |
+Under `@vitest/coverage-v8` (`docs/team/evidence/coverage/coverage-all-business-logic.json`), `exhibits.controller.ts` (`53.99%` statements) and `exhibits.service.ts` (`46.01%` statements) report `100.00%` branch coverage because **V8 bytecode coverage only instruments branches inside functions that actually execute at runtime** (ignoring branches inside uncalled methods). To avoid that V8 artifact, we installed **`@vitest/coverage-istanbul` (`3.2.4`)** (`--coverage.provider=istanbul`, saved in `docs/team/evidence/coverage/coverage-istanbul-all-business-logic.json`), which instruments all AST branches across the entire file at compile time, and we report **both** the W1/W2 in-scope method coverage and the whole-file Istanbul coverage side-by-side:
+
+| File | W1/W2 In-Scope Methods Only (Istanbul & v8) | Whole-File Istanbul Stmts | Whole-File Istanbul Branches | Whole-File Istanbul Funcs | Whole-File Istanbul Lines | Whole-File v8 Stmts / Branches |
+|---|---|---|---|---:|---:|---|
+| `exhibit-workflow.ts` | **100.00%** (`19/19` stmts, `30/30` br, `5/5` fn) | **100.00%** (`19/19`) | **100.00%** (`30/30`) | **100.00%** (`5/5`) | **100.00%** (`17/17`) | `100.00%` / `100.00%` |
+| `permission.guard.ts` | **100.00%** (`15/15` stmts, `8/8` br, `2/2` fn) | **100.00%** (`15/15`) | **100.00%** (`8/8`) | **100.00%** (`2/2`) | **100.00%** (`12/12`) | `100.00%` / `100.00%` |
+| `exhibits.controller.ts` | **100.00%** (`60/60` stmts, `44/44` br, `7/7` fn; L183–310) | **37.03%** (`60/162`) | **41.50%** (`44/106`) | **23.33%** (`7/30`) | **40.00%** (`56/140`) | `53.99%` / `100.00%` (v8 executed-fn only) |
+| `exhibits.service.ts` | **100.00%** (`66/66` stmts, `70/70` br, `10/10` fn; W1/W2) | **36.66%** (`66/180`) | **46.05%** (`70/152`) | **29.41%** (`10/34`) | **34.28%** (`48/140`) | `46.01%` / `100.00%` (v8 executed-fn only) |
+| **Combined 4-File Total** | **100.00%** (`160/160` stmts, `152/152` br, `24/24` fn) | **42.55%** (`160/376`) | **51.35%** (`152/296`) | **33.80%** (`24/71`) | **43.04%** (`133/309`) | `53.86%` / `100.00%` |
+
+- **In-Scope W1/W2 Methods (100.00% Istanbul Statements, Branches, Functions, and Lines):** Every method participating in W1 (Catalogue Exhibit) or W2 (Validate & Publish) — `exhibit-workflow.ts` (`5/5` functions, `30/30` branches), `permission.guard.ts` (`2/2` functions, `8/8` branches), `exhibits.controller.ts` (`getById`, `similar`, `create`, `update`, `softDelete`, `restore` + constructor: `7/7` functions, `44/44` Istanbul branches), and `exhibits.service.ts` (`findById`, `generateDisplayId`, `create`, `update`, `softDelete`, `restore`, `recordDiff` + array/filter callbacks: `10/10` functions, `70/70` Istanbul branches) — achieves **100.00% branch and statement coverage (`152/152` branches, `160/160` statements)**.
+- **Uncovered Whole-File Remainder (`144/296` Istanbul branches across 47 uncalled functions/callbacks):** Belongs exclusively to out-of-scope features listed below.
 
 ### Line-by-Line Justification for Uncovered Statements Outside W1/W2 Workflow Scope
 
